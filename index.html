@@ -3608,6 +3608,14 @@ try {
   }
 } catch(err) {}
 
+  if (window.top !== window.self) {
+  window.top.location = window.self.location;
+}
+  document.addEventListener('copy', function(e) {
+  e.preventDefault();
+  // คุณสามารถส่งค่าว่างไปแทนที่ หรือแสดงแจ้งเตือนเบาๆ ได้
+  e.clipboardData.setData('text/plain', '!!!');
+});
 
 </script>
 
