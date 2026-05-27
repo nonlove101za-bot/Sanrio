@@ -3596,15 +3596,13 @@ try {
     }
   }, 1000);
 
-  // 4. การล็อกสิทธิ์การรันโค้ดเฉพาะโดเมนที่คุณใช้งาน (Domain Lock)
-  // ให้แก้ไขข้อความ 'yourdomain.com' เป็นชื่อโดเมนจริงของคุณเมื่ออัปโหลดขึ้นเซิร์ฟเวอร์
-  const allowedDomain = 'anrio-coral.vercel.app'; 
+  const allowedDomain = 'sanrio-coral.vercel.app'; 
   if (window.location.hostname !== allowedDomain && 
       window.location.hostname !== 'localhost' && 
       window.location.hostname !== '127.0.0.1') {
     document.body.innerHTML = `
       <div style="text-align:center; margin-top:100px; font-family:'Fredoka', sans-serif; color:#ff6b8b;">
-        <h2>ขออภัย ไม่อนุญาตให้คัดลอกไฟล์ไปเปิดใช้งานบนโดเมนอื่นค่ะ ♡</h2>
+        <h2>.</h2>
       </div>
     `;
   }
