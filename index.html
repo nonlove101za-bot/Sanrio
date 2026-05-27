@@ -3613,7 +3613,6 @@ try {
 }
   document.addEventListener('copy', function(e) {
   e.preventDefault();
-  // คุณสามารถส่งค่าว่างไปแทนที่ หรือแสดงแจ้งเตือนเบาๆ ได้
   e.clipboardData.setData('text/plain', '!!!');
 });
   function escapeHTML(str) {
@@ -3625,12 +3624,6 @@ try {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-  .section-title::after {
-  ...
-  background-image: url('https://cdn.discordapp.com/attachments/1082201693845987328/1508799179785506877/b83cf1d0058eadbb9553453738a7054c-removebg-preview.png?...');
-  ...
-}
-
 </script>
 
 </body>
