@@ -1,0 +1,3546 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SANRIO</title>
+  
+  <!-- Font Awesome Fallback CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- ฟอนต์สไตล์กลมมน น่ารักสไตล์ Sanrio พร้อม Fredoka One เพื่อความหนาแบบการ์ตูน -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;600;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- ไอคอนแท็บเบราว์เซอร์สไตล์ Sanrio (Hello Kitty) -->
+  <link rel="shortcut icon" href="https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317" type="image/x-icon">
+  
+  <style>
+    /* ==========================================================
+   ระบบควบคุมการแสดงผลป๊อปอัปเมื่อเลื่อนเมาส์มาโดนการ์ด (Hover Popover System)
+   ========================================================== */
+
+/* ตั้งค่าให้การ์ดหลักสามารถแสดงวัตถุที่ล้นออกมานอกขอบการ์ดได้ */
+.member-card {
+  position: relative;
+  overflow: visible !important; /* สำคัญ: ห้ามตัดขอบป๊อปอัปด้านนอก */
+}
+
+/* ดึงการ์ดที่เมาส์กำลังชี้อยู่ให้ลอยขึ้นมาเป็นเลเยอร์บนสุดของจอ เพื่อไม่ให้โดนการ์ดใบอื่นบัง */
+.member-card:hover {
+  z-index: 9999 !important;
+}
+
+/* บล็อกแสงรุ้งสะท้อนบนหน้าการ์ดไม่ให้เล้นทะลักขอบโค้งมนออกไป */
+.holo-overlay {
+  border-radius: 20px;
+}
+
+/* ตั้งค่าเริ่มต้นให้ป๊อปอัปซ่อนตัวอยู่ และจัดตำแหน่งเตรียมอนิเมชันสไลด์ขึ้น */
+.profile-hover-card {
+  position: absolute;
+  bottom: calc(100% + 15px); /* แสดงผลห่างจากหัวการ์ดหลักขึ้นไปด้านบน 15px */
+  left: 50%;
+  transform: translateX(-50%) translateY(15px) scale(0.85); /* ย่อตัวเล็กน้อยและสไลด์ลงล่างเพื่อรอคิวอนิเมชัน */
+  width: 290px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 3px solid rgba(255, 203, 213, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(255, 143, 163, 0.15), 0 0 15px rgba(255, 182, 193, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* ป้องกันเมาส์ชนกล่องป๊อปอัปขณะที่ยังไม่แสดงผล */
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease, visibility 0.3s;
+  z-index: 500;
+  overflow: hidden;
+  text-align: left;
+  overflow: visible !important;
+}
+
+/* เมื่อเอาเมาส์ชี้การ์ดหลัก ให้แสดงป๊อปอัปเลื่อนขึ้นและขยายขนาดตามปกติ */
+.member-card:hover .profile-hover-card {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto; /* อนุญาตให้เอาเมาส์เข้าไปกดปุ่ม View Profile ได้ */
+  transform: translateX(-50%) translateY(0) scale(1); /* อนิเมชันคลี่ตัวเต็มใบ */
+}
+
+/* สร้างสะพานล่องหนเชื่อมต่อช่วงว่าง 15px เพื่อไม่ให้ป๊อปอัปหดกลับเวลาเลื่อนเมาส์ข้ามช่องว่าง */
+.profile-hover-card::before {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+}
+
+
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box;}
+
+    
+    
+    /* สไตล์ scrollbar สีชมพูประกายกลิตเตอร์พร้อมแทร็กหัวใจ */
+    ::-webkit-scrollbar {
+      width: 14px;
+    }
+    ::-webkit-scrollbar-track {
+      background-color: #fff5f6;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'><path fill='%23ffcbd5' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
+      background-size: 14px 14px;
+      background-repeat: repeat-y;
+      background-position: center;
+      border-left: 1px dashed rgba(255, 143, 163, 0.45);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #ff8fa3 0%, #ffcbd5 25%, #ff8fa3 50%, #ffcbd5 75%, #ff8fa3 100%);
+      background-size: 200% 200%;
+      border-radius: 10px;
+      border: 3px solid #fff5f6;
+      box-shadow: inset 0 0 5px rgba(255, 105, 180, 0.4);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #ff69b4 0%, #ffb3c1 50%, #ff69b4 100%);
+    }
+
+    body {
+      font-family: 'Fredoka', 'Quicksand', sans-serif;
+      background: #fff0f3;
+      color: #5c3d47;
+      overflow-x: hidden;
+      transition: background-color 0.8s ease, color 0.8s ease;
+    }
+
+    /* ปรับปรุงเลเยอร์วิดีโอพื้นหลังแบบไฟล์โลคอล (.mp4) ให้เต็มจอ */
+    .bg-parallax-layer {
+      position: fixed;
+      top: -5%;
+      left: -5%;
+      width: 110%;
+      height: 110%;
+      z-index: -5 !important; 
+      overflow: hidden;
+      pointer-events: none !important; 
+      transition: transform 0.15s ease-out;
+      will-change: transform;
+    }
+
+    .bg-parallax-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scale(1.0);
+    }
+
+    /* เลเยอร์สีพาสเทลกระจกฟุ้งละมุน */
+    .bg-video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255, 240, 243, 0.75), rgba(255, 214, 224, 0.8));
+      z-index: -4 !important;
+      pointer-events: none !important;
+      transition: background 0.8s ease;
+    }
+
+    /* ก้อนเมฆดวงดาวลอยล่องเป็นฉากหลัง */
+    .floating-bg-decorations {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -3 !important;
+      pointer-events: none !important;
+      overflow: hidden;
+    }
+    .cloud {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 3.5rem;
+      filter: drop-shadow(0 4px 6px rgba(255,182,193,0.15));
+      animation: drift 30s linear infinite;
+    }
+    .cloud1 { top: 15%; left: -10%; animation-duration: 40s; }
+    .cloud2 { top: 65%; left: -15%; animation-duration: 28s; animation-delay: 5s; }
+    
+    @keyframes drift {
+      0% { left: -10%; transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { left: 110%; transform: scale(1); }
+    }
+    .star-deco {
+      position: absolute;
+      color: rgba(255, 175, 190, 0.4);
+      font-size: 1.5rem;
+      animation: slowPulse 4s ease-in-out infinite alternate;
+    }
+    .star1 { top: 25%; right: 12%; }
+    .star2 { top: 80%; left: 8%; animation-delay: 2s; }
+    @keyframes slowPulse {
+      0% { transform: scale(0.8) rotate(0deg); opacity: 0.4; }
+      100% { transform: scale(1.2) rotate(20deg); opacity: 0.8; }
+    }
+
+    /* กลไกระบบเปลี่ยนหน้าแบบ CSS PURE NAVIGATION */
+    #members {
+      display: none !important;
+      padding: 0 25px 25px 25px; 
+      min-height:100vh;background:transparent;position:relative;
+      z-index: 10;
+    }
+    
+    #landing {
+      display: flex !important;
+      flex-direction:column;justify-content:center;align-items:center;
+      height:100vh;text-align:center;
+      background: transparent;
+      position:relative;overflow:hidden;will-change:transform;
+      z-index: 10 !important; 
+      pointer-events: auto !important; 
+    }
+
+    #toggle-page:checked ~ #landing {
+      display: none !important;
+    }
+    #toggle-page:checked ~ #members {
+      display: block !important;
+    }
+
+    /* ปรับแต่งอักษร SANRIO สไตล์น่ารัก อวบหนา */
+    #landing h1{
+      font-family: 'Fredoka One', 'Fredoka', cursive, sans-serif !important;
+      font-weight: 800; font-size: 5.5rem; color:#ff8fa3;
+      text-shadow: 4px 4px 0px #fff, 0 0 25px rgba(255, 143, 163, 0.4);
+      margin-bottom:30px;
+      letter-spacing:2px;
+      opacity:0;
+      transform:scale(0.9);
+      animation:fadeInText 1.5s forwards;
+    }
+    @keyframes fadeInText{to{opacity:1;transform:scale(1);}}
+    
+    /* ปุ่ม Members สไตล์ปุ่มกดแบบ 3D การ์ตูน */
+    #enter-btn{
+      display: inline-block;
+      position: relative;
+      z-index: 15 !important; 
+      pointer-events: auto !important; 
+      padding:16px 40px;
+      font-family: 'Fredoka One', 'Fredoka', cursive, sans-serif !important;
+      font-size:1.5rem;
+      font-weight:800;
+      color:#fff;
+      border:none;
+      border-radius:50px;
+      background: linear-gradient(135deg, #ff8fa3 0%, #ffb3c1 100%);
+      box-shadow: 0 8px 18px rgba(255, 143, 163, 0.4), inset 0 -4px 0px rgba(0,0,0,0.18);
+      opacity:0;transform:scale(0.8);
+      animation:fadeInBtn 1.5s forwards 0.8s;transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+      text-align: center;
+    }
+    #enter-btn:hover{
+      box-shadow: 0 12px 24px rgba(255, 143, 163, 0.6), inset 0 -4px 0px rgba(0,0,0,0.18);
+      transform:scale(1.08) translateY(-4px);
+    }
+    @keyframes fadeInBtn{to{opacity:1;transform:scale(1);}}
+    
+    #landing footer{
+      position:fixed;bottom:15px;width:100%;text-align:center;font-size:0.85rem;color:#a88590;font-weight: 600;
+      z-index:12;
+      pointer-events: none;
+    }
+
+    /* เมนู Sticky ตกแต่งในรูปแบบ Frosted Glass */
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 240, 243, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000 !important;
+      padding: 15px 15px;
+      margin-bottom: 25px;
+      border-bottom: 2px dashed rgba(255, 143, 163, 0.45);
+      border-radius: 0 0 24px 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow: 0 4px 15px rgba(255, 182, 193, 0.15);
+      transition: background-color 0.8s ease, border-bottom-color 0.8s ease;
+    }
+    header h1{
+      font-family: 'Fredoka One', 'Fredoka', cursive, sans-serif !important;
+      font-size:2.8rem;
+      color:#ff8fa3;
+      text-shadow:3px 3px 0px #fff, 0 0 12px rgba(255,143,163,0.4);
+    }
+    #memberCount{
+      font-size:0.95rem;color:#ff6b8b;padding:8px 16px;border-radius:20px;
+      border:2px solid rgba(255, 204, 213, 0.8);font-weight: 700;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: 0 4px 6px rgba(255, 182, 193, 0.15);
+    }
+
+    /* สไตล์นาฬิกา และตัวนับออนไลน์ */
+    .pixel-clock, .online-counter {
+      font-size: 0.95rem;
+      color: #ff6b8b;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid rgba(255, 204, 213, 0.8);
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.65);
+      box-shadow: 0 4px 6px rgba(255, 182, 193, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pixel-clock::before {
+      content: '🕐';
+    }
+
+    /* ปุ่ม Home & ปุ่ม Theme */
+    .home-btn{
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.65);
+      border:2px solid rgba(255, 204, 213, 0.8);padding:8px 20px;border-radius:30px;
+      color:#ff6b8b;font-weight: 700;transition:0.3s;
+      box-shadow: 0 4px 6px rgba(255, 182, 193, 0.15);
+      user-select: none;
+    }
+    .home-btn:hover{
+      background:#ff8fa3;color:#fff;border-color: #ff8fa3;
+      box-shadow:0 6px 12px rgba(255, 143, 163, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    /* ค้นหา */
+    .search-container{max-width:350px;margin:0 auto 25px;position:relative;z-index: 15;}
+    .search-container input{
+      width:100%;padding:12px 45px;border-radius:25px;
+      border:2px solid rgba(255, 204, 213, 0.7);
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color:#5c3d47;font-weight: 600;outline:none;
+      box-shadow: 0 6px 10px rgba(255,182,193,0.15);
+      transition: all 0.3s ease;
+    }
+    .search-container input::placeholder {
+      color: #c9a0ac;
+    }
+    .search-container input:focus {
+      border-color: #ff8fa3;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 15px rgba(255,143,163,0.3);
+    }
+    .search-container .fa-search{position:absolute;top:50%;left:16px;transform:translateY(-50%);color:#ff8fa3;}
+    
+    .section-title {
+  margin: 25px 0 30px; /* เพิ่มระยะห่างล่างของหัวข้อ */
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.4rem;
+  color: #ff6b8b;
+  text-align: center;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 35px; /* ขยับพื้นที่ด้านล่างเพิ่มขึ้นเพื่อรองรับลายลูกไม้ที่ใหญ่และคมชัด */
+}
+
+/* อัปเดตซูมลวดลายลูกไม้กึ่งกลางรูปภาพ */
+/* อัปเดตขยายขอบลายลูกไม้หัวข้อให้ชนขอบจอแบบไม่ขาดแหว่ง */
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  
+  /* แก้ไข 2 บรรทัดนี้เพื่อขยายกลบระยะห่างขอบจอ */
+  left: -25px; /* ดึงขอบซ้ายให้ยื่นออกไปทับช่องว่างฝั่งซ้าย 25px */
+  width: calc(100% + 50px); /* สั่งขยายหน้ากว้างเพิ่มขึ้น 50px เพื่อดันไปแตะขอบจอฝั่งขวาพอดี */
+  
+  height: 45px;
+  background-image: url('https://cdn.discordapp.com/attachments/1082201693845987328/1508799179785506877/b83cf1d0058eadbb9553453738a7054c-removebg-preview.png?ex=6a16da3c&is=6a1588bc&hm=e106cf4f9011fe4ea11e138fb9f3f8dddd56476b421b16eefec4b86c1e74c2cb&');
+  background-repeat: repeat-x;
+  background-size: auto 200px;
+  background-position: center;
+  opacity: 0.9;
+}
+    .member-center{display:flex;flex-wrap:wrap;justify-content:center;gap:22px;margin-bottom:25px;transform:translateZ(0);}
+    .member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:18px;justify-items:center;}
+    
+    /* การ์ดสมาชิกสไตล์ 3D Holographic */
+    .member-card{
+      position: relative;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 3px solid rgba(255, 229, 236, 0.7);
+      border-radius: 24px;
+      padding: 18px 12px;
+      text-align: center;
+      transition: transform 0.15s ease-out, box-shadow 0.3s, border-color 0.3s;
+      width: 100%;
+      max-width: 160px;
+      height: 255px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 16px rgba(255, 182, 193, 0.15);
+      opacity: 0;
+      transform: translateY(20px);
+      z-index: 20;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+    .member-card.show{animation:cardFadeIn 0.5s forwards;}
+    @keyframes cardFadeIn{to{opacity:1;transform:translateY(0);}}
+
+    /* เอฟเฟกต์แสงการ์ดโฮโลแกรม (สะท้อนแสงสีรุ้ง) */
+    .holo-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(115deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.1) 25%, 
+        rgba(255, 182, 193, 0.3) 38%, 
+        rgba(135, 206, 235, 0.3) 48%, 
+        rgba(255, 255, 255, 0.15) 55%, 
+        transparent 75%
+      );
+      background-size: 250% 250%;
+      background-position: 50% 50%;
+      mix-blend-mode: color-dodge;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .member-card:hover .holo-overlay {
+      opacity: 0.8;
+    }
+
+    /* OWNER - สีทองหรูหราส่องสว่าง */
+    .member-card.owner-card {
+      border-color: rgba(255, 232, 204, 0.7);
+    }
+    .member-card.owner-card:hover {
+      box-shadow: 0 12px 28px rgba(212, 175, 55, 0.35), 0 0 20px rgba(255, 215, 0, 0.4);
+      border-color: #ffd700;
+    }
+    .member-card.owner-card .card-badge {
+      background-color: #fff9e6;
+      color: #b38600;
+      border-color: #ffe699;
+    }
+    .member-card.owner-card .card-fb-link {
+      background: #ffe699;
+      border-color: #ffd700;
+      color: #664d00;
+    }
+    .member-card.owner-card .card-fb-link:hover {
+      background: #ffd700;
+      color: #fff !important;
+    }
+
+    /* LEADERS - สีชมพูประกายเรืองรอง */
+    .member-card.leader-card {
+      border-color: rgba(255, 229, 236, 0.7);
+    }
+    .member-card.leader-card:hover {
+      box-shadow: 0 12px 28px rgba(255, 105, 180, 0.35), 0 0 20px rgba(255, 182, 193, 0.5);
+      border-color: #ff69b4;
+    }
+    .member-card.leader-card .card-badge {
+      background-color: #fff0f3;
+      color: #ff6b8b;
+      border-color: #ffccd5;
+    }
+
+    /* MEMBERS - สีฟ้าครามประกายคริสตัล */
+    .member-card.member-card-blue {
+      border-color: rgba(227, 242, 253, 0.7);
+    }
+    .member-card.member-card-blue:hover {
+      box-shadow: 0 12px 28px rgba(33, 150, 243, 0.25), 0 0 20px rgba(144, 202, 249, 0.4);
+      border-color: #2196f3;
+    }
+    .member-card.member-card-blue .card-badge {
+      background-color: #e3f2fd;
+      color: #1e88e5;
+      border-color: #bbdefb;
+    }
+    .member-card.member-card-blue .card-fb-link {
+      background: #bbdefb;
+      border-color: #90caf9;
+      color: #0d47a1;
+    }
+    .member-card.member-card-blue .card-fb-link:hover {
+      background: #2196f3;
+      color: #fff !important;
+    }
+
+    .card-top-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      transform: translateZ(20px); /* 3D effect */
+    }
+
+    .member-card img{
+      width:105px;height:105px;border-radius:50%;
+      border:4px solid #fff;
+      box-shadow: 0 4px 10px rgba(255,182,193,0.3);
+      object-fit:cover;transition:0.4s;
+    }
+    
+    .member-card h3{
+      color:#5c3d47;
+      font-size:0.95rem;
+      margin:12px 0 4px 0;
+      font-weight: 700;
+      line-height: 1.2;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      word-break: break-word;
+    }
+    
+    .member-card p{
+      color:#ff8fa3;
+      font-size:0.75rem;
+      font-weight: 700;
+      margin-bottom:6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .member-card .card-fb-link {
+      color:#fff;
+      font-size:0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(255, 203, 213, 0.8);
+      border: 1px solid #ffb3c1;
+      width: fit-content;
+      transition: all 0.2s;
+      transform: translateZ(10px);
+    }
+    .member-card .card-fb-link:hover {
+      background: #ff8fa3;
+      color: #fff !important;
+      transform: scale(1.05) translateZ(10px);
+    }
+    
+    /* Popover ข้อมูลส่วนตัวแบบ Frosted Glass และเรืองแสงแยกตามยศ */
+    .profile-hover-card {
+      position: absolute;
+      bottom: calc(100% + 15px);
+      left: 50%;
+      transform: translateX(-50%) translateY(15px) scale(0.85);
+      width: 290px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 3px solid rgba(255, 203, 213, 0.8);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(255, 143, 163, 0.15), 0 0 15px rgba(255, 182, 193, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease, visibility 0.35s;
+      z-index: 500;
+      overflow: hidden;
+      text-align: left;
+    }
+
+    /* แยกแสงเรืองรองตามระดับเมื่อ Hover Preview */
+    .owner-card .profile-hover-card { border-color: #ffd700; box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4); }
+    .leader-card .profile-hover-card { border-color: #ff69b4; box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4); }
+    .member-card-blue .profile-hover-card { border-color: #2196f3; box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3); }
+
+    .profile-hover-card::before {
+      content: "";
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: transparent;
+      
+  content: "";
+  position: absolute;
+  bottom: -30px; /* ยื่นสะพานลงด้านล่างเพิ่มขึ้นเพื่อครอบคลุมรอยต่อ */
+  left: -30px;   /* ขยายความกว้างฝั่งซ้าย */
+  right: -30px;  /* ขยายความกว้างฝั่งขวา */
+  height: 40px;  /* เพิ่มความหนาของสะพาน */
+  background: transparent;
+  z-index: -1;
+}
+
+    
+    
+
+    .member-card:hover .profile-hover-card {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0) scale(1);
+      transition-delay: 0.2s;
+    }
+    .member-card:hover {
+  z-index: 9999 !important;
+}
+
+    .card-header-bg {
+      background: linear-gradient(135deg, rgba(255, 229, 236, 0.7) 0%, rgba(255, 203, 213, 0.7) 100%);
+      height: 75px;
+      position: relative;
+      border-radius: 17px 17px 0 0;
+    }
+
+    .card-avatar {
+      position: absolute;
+      bottom: -20px;
+      left: 15px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      overflow: hidden;
+      background-color: #fff;
+      box-shadow: 0 3px 8px rgba(255,182,193,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-fb-watermark {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .card-body {
+      padding: 30px 15px 15px 15px;
+    }
+
+    .card-name {
+      color: #5c3d47 !important;
+      margin: 0 !important;
+      font-size: 16px !important;
+      font-weight: bold;
+      text-shadow: none !important;
+    }
+
+    .card-username {
+      color: #a88590;
+      font-size: 11px;
+      margin: 3px 0 12px 0;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(255, 204, 213, 0.8);
+      background-color: #fff0f3;
+      color: #ff6b8b;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+    }
+
+    .card-badge i {
+      margin-right: 4px;
+    }
+
+    .view-profile-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 203, 213, 0.8) !important;
+      border: 1px solid #ffcbd5 !important;
+      border-radius: 12px;
+      color: #ff5e7e !important;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.2s;
+      gap: 6px;
+    }
+
+    .view-profile-btn:hover {
+      background: #ff8fa3 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 10px rgba(255, 143, 163, 0.3);
+    }
+
+    .profile-hover-card::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 10px;
+      height: 10px;
+      background: #ffffff;
+      border-right: 3px solid rgba(255, 203, 213, 0.8);
+      border-bottom: 3px solid rgba(255, 203, 213, 0.8);
+      z-index: 1;
+    }
+
+    /* ปุ่มเปลี่ยนหน้า */
+    .pagination{display:flex;justify-content:center;gap:12px;margin-top:25px;position:relative;z-index: 15;}
+    .page-btn{
+      padding:6px 14px;background:rgba(255, 255, 255, 0.65);border-radius:20px;
+      border:2px solid rgba(255, 204, 213, 0.8);color:#ff6b8b;font-weight:700;
+      transition:0.3s;
+      box-shadow:0 3px 5px rgba(255,182,193,0.1);
+    }
+    .page-btn.active{background:#ff8fa3;color:#fff;border-color: #ff8fa3;}
+    .page-btn:hover{background:#ffcbd5;color:#ff5e7e;border-color:#ffcbd5;}
+
+    .skeleton {
+      width:105px;height:105px;border-radius:50%;
+      background:linear-gradient(90deg,#fff0f3 0%, #ffe5ec 50%, #fff0f3 100%);
+      background-size:200% 100%;animation: shimmer 1.2s infinite;
+      display:flex;align-items:center;justify-content:center;overflow:hidden;
+      border:3px solid rgba(255,182,193,0.3);
+    }
+    @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+    .skeleton img{display:none;width:100%;height:100%;border-radius:50%;object-fit:cover;}
+
+    .parallax {transition: transform 0.08s linear; will-change:transform;}
+
+    /* ========== MUSIC PLAYER WITH CANVAS SPECTRUM VISUALIZER ========== */
+    /* ==========================================================
+   ระบบควบคุมแผงเครื่องเล่นเพลงสไตล์แคปซูล (Sleek Capsule Music Player)
+   ========================================================== */
+.capsule-music-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2000 !important;
+  background: rgba(18, 18, 18, 0.85); /* คุมโทนดำหรูหราตามภาพสกรีนช็อต */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+   overflow: visible !important;
+  font-family: 'Fredoka', 'Quicksand', sans-serif;
+}
+
+/* 1. สไตล์เมื่ออยู่ในสถานะ "มินิแคปซูล" */
+.capsule-music-player.mini-mode {
+  width: 210px;
+  height: 52px;
+  border-radius: 50px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.capsule-music-player.mini-mode:hover {
+  transform: scale(1.04) translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.mini-player-view {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.mini-album-art-wrapper {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mini-art-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  z-index: 2;
+}
+
+/* แผ่นอวตาร์หมุนเมื่อเพลงทำงาน */
+.mini-art-img.spinning {
+  animation: spinVinyl 3.5s linear infinite;
+}
+.mini-art-img.paused {
+  animation-play-state: paused;
+}
+@keyframes spinVinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* อนิเมชันคลื่นเรดาร์แผ่ออกรอบวงกลมอวตาร์ */
+.radar-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 1;
+  animation: radarWave 2s infinite ease-out;
+}
+/* คอนเซปต์คลื่นแผ่กระจายเป็นวงกว้างพ้นตัวแคปซูล */
+@keyframes radarWave {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+  50% {
+    opacity: 0.4;
+    border-color: rgba(187, 134, 252, 0.35);
+  }
+  100% {
+    transform: scale(1.8); /* <-- เพิ่มตรงนี้จาก 1.6 เป็น 2.4 เพื่อขยายขนาดคลื่นให้กว้างขึ้น */
+    opacity: 0;
+    border-color: rgba(255, 255, 255, 0);
+  }
+}
+
+/* 2. สไตล์เมื่อกางขยายแผงเต็มจอ (Expanded Mode) */
+.capsule-music-player.expanded-mode {
+  width: 320px;
+  height: 250px;
+  border-radius: 28px;
+  padding: 16px;
+}
+
+.capsule-music-player.mini-mode .expanded-player-view { display: none; }
+.capsule-music-player.expanded-mode .mini-player-view { display: none; }
+
+.expanded-player-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.expanded-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 20px;
+}
+.now-playing-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.live-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 0 8px #ffffff;
+  animation: pulseDot 1.5s infinite alternate;
+}
+@keyframes pulseDot {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+.status-label {
+  font-size: 0.7rem;
+  color: #888888;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: #888888;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.collapse-btn:hover {
+  color: #ffffff;
+}
+
+/* รายละเอียดตัวภาพอวตาร์เหลี่ยมและชื่อเพลงศิลปินด้านใน */
+.expanded-body-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+.expanded-art-img {
+  width: 65px;
+  height: 65px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.expanded-text-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  overflow: hidden;
+}
+.expanded-song-title {
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 700;
+  margin: 0 0 3px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.expanded-artist-name {
+  font-size: 0.75rem;
+  color: #888888;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* แถบหลอดเวลา Seek Bar วิ่งเล่นเพลง */
+.progress-bar-container {
+  margin-top: 10px;
+}
+.seek-slider {
+  width: 100%;
+  height: 3px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.seek-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.1s;
+}
+.seek-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.4);
+}
+.progress-time-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: #666666;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* แถบชุดปุ่มควบคุมดนตรีและปรับเสียง */
+.expanded-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.volume-control-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.volume-slider-bar {
+  width: 50px;
+  height: 3px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  outline: none;
+}
+.volume-slider-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.media-controls-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.control-btn {
+  background: transparent;
+  border: none;
+  color: #888888;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.control-btn:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+.control-btn.mini-sub-btn {
+  font-size: 0.75rem;
+  color: #666666;
+}
+.control-btn.mini-sub-btn:hover {
+  color: #ffffff;
+}
+
+/* ปุ่มกลมใหญ่ Play/Pause สีขาวด้านล่างขวา */
+.big-play-pause-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  color: #000000;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+}
+.big-play-pause-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+/* ปรับแต่งคิวเพลงให้เข้ากับแคปซูลกระจกสีดำ */
+.capsule-music-player .playlist-dropup {
+  background: rgba(18, 18, 18, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  bottom: calc(100% + 15px) !important;
+  right: 0px !important;
+  width: 220px !important;
+}
+.capsule-music-player .playlist-dropup-title {
+  color: #ffffff !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+.capsule-music-player .playlist-item {
+  color: #888888 !important;
+}
+.capsule-music-player .playlist-item:hover,
+.capsule-music-player .playlist-item.playing {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+    
+    /* ไอคอนแผ่นเสียงหมุนและอนิเมชันกระดิกตามเสียงดนตรี */
+    .vinyl-icon-wrapper {
+      font-size: 1.1rem;
+      color: #ff6b8b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s;
+    }
+    .vinyl-spinning {
+      animation: rotateVinyl 3s linear infinite;
+    }
+    .vinyl-bouncing {
+      animation: rotateVinyl 3s linear infinite, wiggleVinyl 0.6s infinite alternate cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    @keyframes rotateVinyl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes wiggleVinyl {
+      0% { transform: scale(1.0); }
+      100% { transform: scale(1.22) rotate(12deg); }
+    }
+
+    /* แถบสัญญาณเสียงแบบคลื่น Graph (Canvas Audio Spectrum) */
+    .equalizer {
+      display: flex;
+      align-items: center;
+      margin-left: 5px;
+    }
+    #visualizerCanvas {
+      background: transparent;
+      border-radius: 4px;
+      width: 80px;
+      height: 24px;
+    }
+
+    .music-player .volume-slider {
+      width: 70px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: #ffcbd5;
+      border-radius: 5px;
+      outline: none;
+    }
+    .music-player .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff8fa3;
+    }
+
+    /* Playlist Drop-up บนเครื่องเล่นเพลง */
+    .playlist-dropup {
+      position: absolute;
+      bottom: calc(100% + 15px);
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 3px solid rgba(255, 203, 213, 0.8);
+      border-radius: 20px;
+      width: 220px;
+      max-height: 250px;
+      overflow-y: auto;
+      box-shadow: 0 8px 25px rgba(255, 143, 163, 0.2);
+      display: none;
+      flex-direction: column;
+      z-index: 2005;
+      padding: 10px;
+    }
+    .playlist-dropup.active {
+      display: flex;
+    }
+    .playlist-dropup-title {
+      font-size: 0.85rem;
+      color: #ff6b8b;
+      font-weight: 700;
+      padding: 5px;
+      border-bottom: 2px dashed rgba(255, 143, 163, 0.45);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .playlist-item {
+      font-size: 0.8rem;
+      color: #5c3d47;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .playlist-item:hover, .playlist-item.playing {
+      background: rgba(255, 229, 236, 0.8);
+      color: #ff5e7e;
+    }
+
+    /* Detailed Profile Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(92, 61, 71, 0.35);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-container {
+      background: rgba(255, 255, 255, 0.95);
+      border: 4px solid #ffccd5;
+      border-radius: 30px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 15px 35px rgba(255, 143, 163, 0.3);
+      overflow: hidden;
+      animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      position: relative;
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(30px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modal-header-bg {
+      background: linear-gradient(135deg, #ffe5ec 0%, #ffcbd5 100%);
+      height: 100px;
+      position: relative;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 15px; right: 15px;
+      background: white;
+      border: none;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      color: #ff6b8b;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: 0.2s;
+    }
+    .modal-close-btn:hover {
+      transform: scale(1.1);
+      background: #ffcbd5;
+      color: white;
+    }
+    .modal-avatar {
+      position: absolute;
+      bottom: -40px; left: 30px;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 4px 12px rgba(255,182,193,0.3);
+      object-fit: cover;
+      background: white;
+    }
+    .modal-body {
+      padding: 55px 30px 30px;
+    }
+    .modal-name {
+      font-size: 1.4rem;
+      color: #5c3d47;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .modal-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .modal-desc-box {
+      background: #fff5f6;
+      border: 2px dashed rgba(255, 143, 163, 0.45);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #7d5a65;
+    }
+    .modal-info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: #5c3d47;
+      font-weight: 600;
+    }
+    .modal-info-row i {
+      color: #ff6b8b;
+      width: 16px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    /* ========== Chatbot Widget & Animation ========== */
+    .chatbot-widget {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 2000 !important;
+    }
+    .chatbot-toggle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 203, 213, 0.9);
+      background: white;
+      box-shadow: 0 6px 20px rgba(255, 143, 163, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chatbot-toggle:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+    .chatbot-toggle img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+    }
+    .chat-panel {
+      position: absolute;
+      bottom: 75px;
+      left: 0;
+      width: 320px;
+      height: 420px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 4px solid #ffccd5;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(255, 143, 163, 0.2);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: chatFadeIn 0.3s ease-out;
+    }
+    @keyframes chatFadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-panel.active {
+      display: flex;
+    }
+    .chat-header {
+      background: linear-gradient(135deg, #fff0f3 0%, #ffe5ec 100%);
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #ffccd5;
+    }
+    .chat-bot-selector {
+      display: flex;
+      gap: 10px;
+    }
+    .bot-selector-btn {
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid #ffccd5;
+      background: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #a88590;
+    }
+    .bot-selector-btn.active.melody {
+      background: #ffb3c1;
+      color: white;
+      border-color: #ff8fa3;
+    }
+    .bot-selector-btn.active.kuromi {
+      background: #c39bd3;
+      color: white;
+      border-color: #a569bd;
+    }
+    .chat-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    /* Bubble Message Animation */
+    .chat-msg {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      font-weight: 600;
+      transform: scale(0.85);
+      opacity: 0;
+      animation: bubbleAppear 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+    }
+    @keyframes bubbleAppear {
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-msg.bot-msg {
+      align-self: flex-start;
+      background: #f1f0f0;
+      color: #5c3d47;
+      border-bottom-left-radius: 5px;
+    }
+    .chat-msg.bot-msg.melody-style {
+      background: #fff0f3;
+      border: 1px solid #ffccd5;
+    }
+    .chat-msg.bot-msg.kuromi-style {
+      background: #f5eef8;
+      border: 1px solid #ebdef0;
+    }
+    .chat-msg.user-msg {
+      align-self: flex-end;
+      background: #ff8fa3;
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    /* AI Typing Bouncing Dots */
+    .typing-indicator-bubble {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 15px !important;
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #a88590;
+      border-radius: 50%;
+      animation: typingBounce 1s infinite alternate;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0% { transform: translateY(0); opacity: 0.3; }
+      100% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Sticker & Autocomplete Mention Panels with Glassmorphism */
+    .sticker-panel, .mention-autocomplete {
+      position: absolute;
+      bottom: 60px;
+      left: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 3px solid rgba(255, 203, 213, 0.85);
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(255, 143, 163, 0.15);
+      display: none;
+      z-index: 2009;
+    }
+    .sticker-panel { padding: 12px; }
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      justify-items: center;
+    }
+    .sticker-grid span {
+      font-size: 1.8rem;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+    }
+    .sticker-grid span:hover {
+      transform: scale(1.35) rotate(10deg);
+    }
+
+    .mention-autocomplete {
+      max-height: 150px;
+      overflow-y: auto;
+      flex-direction: column;
+      z-index: 2010;
+    }
+    .mention-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #5c3d47;
+      transition: all 0.2s;
+    }
+    .mention-item:hover {
+      background: rgba(255, 240, 243, 0.9);
+      color: #ff6b8b;
+    }
+    .mention-item img {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+    }
+
+    .chat-input-row {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ffe5ec;
+      background: white;
+      gap: 8px;
+    }
+    .chat-input-row input {
+      flex: 1;
+      border: 2px solid #ffe5ec;
+      border-radius: 20px;
+      padding: 6px 15px;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #5c3d47;
+    }
+    .chat-input-row input:focus {
+      border-color: #ff8fa3;
+    }
+    .chat-send-btn, .chat-sticker-btn {
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+    .chat-send-btn { background: #ff8fa3; color: white; }
+    .chat-send-btn:hover { transform: scale(1.05); background: #ff6b8b; }
+    .chat-sticker-btn { background: rgba(255, 229, 236, 0.8); color: #ff6b8b; }
+    .chat-sticker-btn:hover { transform: scale(1.05); background: #ffb3c1; color: white; }
+
+    /* ========== เอฟเฟกต์เมาส์พาสเทลพุ้งกระจาย ========== */
+    .custom-particle {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+      z-index: 10000;
+      animation: particleFly 0.8s ease-out forwards;
+    }
+    @keyframes particleFly {
+      0% {
+        transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
+
+    .trail-dot {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+      z-index: 9998;
+      font-size: 11px;
+      animation: trailFade 0.6s linear forwards;
+    }
+    @keyframes trailFade {
+      0% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0.2) rotate(180deg) translateY(12px);
+        opacity: 0;
+      }
+    }
+
+    /* ========== เอฟเฟกต์ดอกไม้ร่วงหล่น ========== */
+    .falling-leaf {
+      position: fixed;
+      top: -10%;
+      pointer-events: none;
+      z-index: 1500;
+      user-select: none;
+      will-change: transform;
+      animation: fallAnimation linear forwards;
+    }
+    @keyframes fallAnimation {
+      0% {
+        transform: translateY(-20px) rotate(0deg) translateX(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg) translateX(var(--drift-x));
+        opacity: 0;
+      }
+    }
+
+    .floating-sticker {
+      position: fixed;
+      bottom: -50px;
+      pointer-events: none;
+      z-index: 1;
+      user-select: none;
+      will-change: transform;
+      animation: floatStickerUp linear forwards;
+      opacity: 0.55;
+      filter: drop-shadow(0 2px 5px rgba(255, 182, 193, 0.22));
+    }
+    @keyframes floatStickerUp {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0.85);
+        opacity: 0;
+      }
+      12% { opacity: 0.55; }
+      88% { opacity: 0.55; }
+      100% {
+        transform: translateY(-110vh) rotate(360deg) scale(1.15);
+        opacity: 0;
+      }
+    }
+
+    .cute-toast {
+      position: fixed;
+      top: -100px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #ffcbd5;
+      border-radius: 30px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(255, 143, 163, 0.25);
+      z-index: 9999;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      color: #ff5e7e;
+      font-size: 1.1rem;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .cute-toast.show {
+      top: 20px;
+    }
+
+    @media (max-width: 550px) {
+      .music-player .track-name { display: none; }
+      .music-player { padding: 6px 12px; gap: 6px; }
+      .music-player .volume-slider { width: 50px; }
+    }
+
+    @media (max-width:480px){
+      #landing h1{font-size:2.5rem;}
+      .member-card{max-width:140px;padding:12px; height: 245px;}
+    }
+
+    /* ========== Pixel Character Floating (Ambient Float) ========== */
+    .pixel-characters-section {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 25px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      z-index: 12;
+      pointer-events: auto !important;
+    }
+
+    .pixel-char-container {
+      position: relative;
+      display: inline-block;
+      animation: ambientFloat 4s ease-in-out infinite;
+    }
+
+    .pixel-char-container:nth-child(1) { animation-delay: 0s; }
+    .pixel-char-container:nth-child(2) { animation-delay: 0.6s; }
+    .pixel-char-container:nth-child(3) { animation-delay: 1.2s; }
+    .pixel-char-container:nth-child(4) { animation-delay: 1.8s; }
+    .pixel-char-container:nth-child(5) { animation-delay: 2.4s; }
+    .pixel-char-container:nth-child(6) { animation-delay: 3s; }
+
+    @keyframes ambientFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .pixel-char-container img {
+      width: 90px;
+      height: 90px;
+      background-color: #ffffff;
+      border: 3px solid #ffccd5;
+      border-radius: 50%;
+      padding: 5px;
+      box-shadow: 0 4px 8px rgba(255, 182, 193, 0.15);
+      object-fit: contain; 
+      image-rendering: pixelated; 
+      transition: transform 0.2s ease-in-out;
+    }
+
+    @keyframes pixelBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .pixel-char-container:hover img {
+      animation: pixelBounce 0.55s ease-in-out infinite;
+    }
+
+    .speech-bubble {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 115%;
+      left: 50%;
+      transform: translateX(-50%) translateY(5px);
+      background-color: #ffffff;
+      border: 3px solid #ffccd5;
+      border-radius: 20px; 
+      padding: 6px 14px;
+      color: #ff6b8b;
+      font-family: 'Fredoka', 'Quicksand', sans-serif; 
+      font-weight: 700; 
+      font-size: 13px;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(255, 182, 193, 0.2);
+      z-index: 1001;
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px 8px 0;
+      border-style: solid;
+      border-color: #ffccd5 transparent;
+      display: block;
+      width: 0;
+    }
+
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+      z-index: 1002;
+    }
+
+    .pixel-char-container:hover .speech-bubble {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ========== DARK THEME STYLES (KUROMI STYLE - โทนม่วงเข้ม/ดำ) ========== */
+    body.dark-theme {
+      background: #11081c !important;
+      color: #ebd4ff !important;
+    }
+    body.dark-theme .bg-video-overlay {
+      background: linear-gradient(135deg, rgba(17, 8, 28, 0.85), rgba(35, 14, 54, 0.9)) !important;
+    }
+    body.dark-theme header {
+      background: rgba(22, 11, 36, 0.75) !important;
+      border-bottom-color: rgba(162, 115, 222, 0.5) !important;
+    }
+    body.dark-theme header h1 {
+      color: #bb86fc !important;
+      text-shadow: 3px 3px 0px #11081c, 0 0 12px rgba(187, 134, 252, 0.5) !important;
+    }
+    body.dark-theme .member-card {
+      background: rgba(33, 19, 48, 0.65) !important;
+      border-color: rgba(162, 115, 222, 0.35) !important;
+    }
+    body.dark-theme .member-card h3 {
+      color: #ebd4ff !important;
+    }
+    body.dark-theme .home-btn, 
+    body.dark-theme .pixel-clock, 
+    body.dark-theme .online-counter, 
+    body.dark-theme #memberCount {
+      background: rgba(38, 20, 56, 0.8) !important;
+      border-color: rgba(162, 115, 222, 0.6) !important;
+      color: #bb86fc !important;
+    }
+    body.dark-theme .home-btn:hover {
+      background: #9b51e0 !important;
+      color: #fff !important;
+      border-color: #9b51e0 !important;
+    }
+    body.dark-theme .search-container input {
+      background: rgba(33, 19, 48, 0.7) !important;
+      border-color: rgba(162, 115, 222, 0.5) !important;
+      color: #ebd4ff !important;
+    }
+    body.dark-theme .search-container input::placeholder {
+      color: #9d83b5 !important;
+    }
+    body.dark-theme .search-container .fa-search {
+      color: #bb86fc !important;
+    }
+    body.dark-theme .chat-panel {
+      background: rgba(20, 10, 31, 0.92) !important;
+      border-color: #9b51e0 !important;
+    }
+    body.dark-theme .chat-msg.bot-msg {
+      background: #27143a !important;
+      color: #ebd4ff !important;
+    }
+    body.dark-theme .chat-input-row {
+      background: #180a26 !important;
+      border-top-color: #3b1e54 !important;
+    }
+    body.dark-theme .chat-input-row input {
+      background: #27143a !important;
+      border-color: #3b1e54 !important;
+      color: #ebd4ff !important;
+    }
+    body.dark-theme .music-player {
+      background: rgba(25, 11, 41, 0.65) !important;
+      border-color: rgba(162, 115, 222, 0.6) !important;
+    }
+    body.dark-theme .music-player .track-name {
+      color: #bb86fc !important;
+    }
+    body.dark-theme .playlist-dropup {
+      background: rgba(20, 10, 31, 0.95) !important;
+      border-color: #9b51e0 !important;
+    }
+    body.dark-theme .playlist-item {
+      color: #ebd4ff !important;
+    }
+    body.dark-theme .playlist-item:hover, 
+    body.dark-theme .playlist-item.playing {
+      background: rgba(155, 81, 224, 0.3) !important;
+      color: #f1e2ff !important;
+    }
+    body.dark-theme .profile-hover-card {
+      background: rgba(25, 12, 38, 0.92) !important;
+      border-color: #9b51e0 !important;
+      transition-delay: 0.2s;
+    }
+    body.dark-theme .profile-hover-card .card-name {
+      color: #ebd4ff !important;
+    }
+
+    /* Screen Pet jump animation */
+    @keyframes petJumpAnimation {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-25px); }
+    }
+    .profile-hover-card .card-body {
+  text-align: left !important;
+}
+.profile-hover-card .card-name {
+  display: block !important; /* ปลดล็อก Flexbox เพื่อให้อ่านค่าชิดซ้ายได้ */
+  text-align: left !important; /* สั่งชิดซ้าย */
+  min-height: auto !important; /* เคลียร์ความสูงของกล่องข้อความไม่ให้ดึงระยะ */
+}
+
+/* จัดชิดซ้ายของลิงก์/ชื่อยูสเซอร์เนมด้านล่าง */
+.profile-hover-card .card-username {
+  text-align: left !important; /* สั่งชิดซ้าย */
+}
+/* ==========================================================
+   โทนสีมืดสำหรับหน้าต่างโปรไฟล์หลัก (Profile Modal Dark Theme)
+   ========================================================== */
+
+/* 1. สีพื้นหลังของกล่อง และสีขอบกล่องด้านนอก */
+body.dark-theme .modal-container {
+  background: rgba(33, 19, 48, 0.98) !important;
+  border-color: #9b51e0 !important;
+  box-shadow: 0 15px 35px rgba(155, 81, 224, 0.25);
+}
+
+/* 2. สีพื้นหลังแถบหัวรูปภาพด้านบน */
+body.dark-theme .modal-header-bg {
+  background: linear-gradient(135deg, #3b1e54 0%, #180a26 100%) !important;
+}
+
+/* 3. ปุ่มกดปิด (กากบาท) ด้านบนขวา */
+body.dark-theme .modal-close-btn {
+  background: #3b1e54 !important;
+  color: #bb86fc !important;
+}
+body.dark-theme .modal-close-btn:hover {
+  background: #9b51e0 !important;
+  color: #ffffff !important;
+}
+
+/* 4. สีชื่อผู้ใช้ (ตัวใหญ่) */
+body.dark-theme .modal-name {
+  color: #ebd4ff !important;
+}
+
+/* 5. กล่องประวัติแนะนำตัว (Bio) */
+body.dark-theme .modal-desc-box {
+  background: #180a26 !important;
+  border-color: rgba(162, 115, 222, 0.5) !important;
+  color: #d3b5f7 !important;
+}
+
+/* 6. แถวข้อความข้อมูลรายชื่อด้านล่างและไอคอน */
+body.dark-theme .modal-info-row {
+  color: #ebd4ff !important;
+}
+body.dark-theme .modal-info-row i {
+  color: #bb86fc !important;
+}
+body.dark-theme .modal-info-row a {
+  color: #bb86fc !important;
+}
+
+/* 7. ปุ่มติดต่อผ่านช่องทาง Facebook ด้านล่างสุด */
+body.dark-theme .modal-container .view-profile-btn {
+  background: rgba(155, 81, 224, 0.3) !important;
+  border-color: rgba(162, 115, 222, 0.5) !important;
+  color: #ebd4ff !important;
+}
+body.dark-theme .modal-container .view-profile-btn:hover {
+  background: #9b51e0 !important;
+  color: #ffffff !important;
+}
+#visualizerCanvas {
+  filter: drop-shadow(0 0 8px rgba(255, 143, 163, 0.4));
+  transition: filter 0.5s ease;
+}
+body.dark-theme #visualizerCanvas {
+  filter: drop-shadow(0 0 10px rgba(187, 134, 252, 0.6));
+}
+#visualizerCanvas {
+  filter: drop-shadow(0 0 8px rgba(255, 143, 163, 0.4));
+  transition: filter 0.5s ease;
+}
+body.dark-theme #visualizerCanvas {
+  filter: drop-shadow(0 0 10px rgba(187, 134, 252, 0.6));
+}
+
+
+
+  </style>
+</head>
+<body>
+
+<!-- INPUT ควบคุมสถานะสลับหน้าของเบราว์เซอร์ผ่าน CSS Pure Navigation -->
+<input type="checkbox" id="toggle-page" style="display: none;">
+
+<!-- เลเยอร์วิดีโอพื้นหลังแบบไฟล์โลคอล (.mp4) -->
+<div class="bg-parallax-layer">
+  <video autoplay muted loop playsinline>
+    <source src="background.mp4" type="video/mp4">
+  </video>
+  <div class="bg-video-overlay"></div>
+</div>
+
+<!-- ปุยเมฆและหัวใจลอยล่องอยู่เบื้องหลัง -->
+<div class="floating-bg-decorations">
+  <div class="cloud cloud1"><i class="fas fa-cloud"></i></div>
+  <div class="cloud cloud2"><i class="fas fa-cloud"></i></div>
+  <div class="star-deco star1"><i class="fas fa-star"></i></div>
+  <div class="star-deco star2"><i class="fas fa-heart"></i></div>
+</div>
+
+<!-- ป๊อปอัปสุ่มคำต้อนรับ -->
+<div id="cute-welcome-toast" class="cute-toast">
+  <span>🎀</span>
+  <span id="toast-message-text">Welcome back ♡</span>
+</div>
+
+<!-- หน้า LANDING PAGE -->
+<div id="landing">
+  <h1>SANRIO</h1>
+  <label for="toggle-page" id="enter-btn" onclick="triggerMusicAndEffects(event)"><i class="fas fa-heart"></i> Members</label>
+  
+  <div class="pixel-characters-section">
+    <!-- ตัวละครที่ 1 -->
+    <div class="pixel-char-container">
+      <div class="speech-bubble">Hello Kitty 🎀</div>
+      <img src="https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317" alt="Hello Kitty">
+    </div>
+
+    <!-- ตัวละครที่ 2 -->
+    <div class="pixel-char-container">
+      <div class="speech-bubble">Kuromi 😈</div>
+      <img src="https://www.sanrio.com/cdn/shop/files/198445178610_800x.png?v=1749746553" alt="Kuromi">
+    </div>
+
+    <!-- ตัวละครที่ 3 -->
+    <div class="pixel-char-container">
+      <div class="speech-bubble">My Melody 🌸</div>
+      <img src="https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695" alt="My Melody">
+    </div>
+
+    <!-- ตัวละครที่ 4 -->
+    <div class="pixel-char-container">
+      <div class="speech-bubble">Hello Kitty Classic 🍎</div>
+      <img src="https://www.sanrio.com/cdn/shop/files/572845-Zoom.1_800x.jpg?v=1776971542" alt="Hello Kitty Classic">
+    </div>
+
+    <!-- ตัวละครที่ 5 -->
+    <div class="pixel-char-container">
+      <div class="speech-bubble">Kuromi Classic 🖤</div>
+      <img src="https://www.sanrio.com/cdn/shop/files/572900-Zoom.1_800x.jpg?v=1776971678" alt="Kuromi Classic">
+    </div>
+
+    <!-- ตัวละครที่ 6 -->
+    <div class="pixel-char-container">
+      <div class="speech-bubble">My Melody Classic 💕</div>
+      <img src="https://www.sanrio.com/cdn/shop/files/572896-Zoom.1_800x.jpg?v=1776971647" alt="My Melody Classic">
+    </div>
+  </div>
+
+  <footer>Created by Designed by Werkk Highneverdie © 2026 SANRIO 🎀 SANRIO STYLE</footer>
+</div>
+
+<!-- หน้า MEMBERS LIST -->
+<div id="members">
+  <header>
+    <h1>SANRIO 🌸</h1>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap: wrap;">
+      <!-- ปุ่มเปลี่ยนธีม -->
+      <button id="themeToggleBtn" class="home-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i> Dark Theme</button>
+      <div id="liveClock" class="pixel-clock">00:00:00</div>
+      
+      <div id="memberCount">Members: 0</div>
+      <label for="toggle-page" class="home-btn" id="homeBtn" onclick="resetSearch()"><i class="fas fa-home"></i> Home</label>
+    </div>
+  </header>
+
+  <div class="search-container">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="Search member name...">
+  </div>
+
+  <div id="ownerSection" style="display: none;">
+    <div class="section-title">✨ OWNER ✨</div>
+    <div class="member-center" id="ownerGrid"></div>
+  </div>
+
+  <div id="leadersSection" style="display: none;">
+    <div class="section-title">⭐ LEADERS ⭐</div>
+    <div class="member-center" id="leadersGrid"></div>
+  </div>
+
+  <div id="membersSection" style="display: none;">
+    <div class="section-title">🎀 MEMBERS 🎀</div>
+    <div class="member-grid" id="membersGrid"></div>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- DETAILED PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal" onclick="closeProfileModal()">
+  <div class="modal-container" onclick="event.stopPropagation()">
+    <div class="modal-header-bg">
+      <button class="modal-close-btn" onclick="closeProfileModal()"><i class="fas fa-times"></i></button>
+      <img class="modal-avatar" id="modalAvatar" src="" alt="Avatar">
+    </div>
+    <div class="modal-body">
+      <h2 class="modal-name" id="modalName">Name</h2>
+      <div class="modal-badges" id="modalBadges"></div>
+      <div class="modal-desc-box" id="modalBio">- No bio available -</div>
+      <div class="modal-info-row">
+        <i class="fas fa-heart"></i>
+        <span>Favorite Character: <strong id="modalFavChar">Hello Kitty</strong></span>
+      </div>
+      <div class="modal-info-row">
+        <i class="fab fa-facebook"></i>
+        <span>Facebook: <a id="modalFbLink" href="#" target="_blank" style="color: #ff6b8b;">Visit Profile</a></span>
+      </div>
+      <div class="modal-info-row" id="modalInstaRow">
+        <i class="fab fa-instagram"></i>
+        <span>Instagram: <a id="modalInstaLink" href="#" target="_blank" style="color: #ff6b8b;">Visit Instagram</a></span>
+      </div>
+      <div class="modal-actions">
+        <a id="modalActionFb" href="#" target="_blank" class="view-profile-btn" style="width:100%;">
+          <i class="fab fa-facebook-f"></i> Contact via Facebook
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOUBLE AI CHATBOT WIDGET -->
+<div class="chatbot-widget" id="chatbotWidget">
+  <div class="chatbot-toggle" onclick="toggleChatPanel()">
+    <img id="chatToggleAvatar" src="https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695" alt="Chatbot">
+  </div>
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <div class="chat-bot-selector">
+        <button class="bot-selector-btn active melody" onclick="selectBot('melody')">My Melody 🌸</button>
+        <button class="bot-selector-btn kuromi" onclick="selectBot('kuromi')">Kuromi 😈</button>
+      </div>
+      <button class="modal-close-btn" style="position:static; width:24px; height:24px; font-size:0.8rem;" onclick="toggleChatPanel()"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="chat-body" id="chatBody"></div>
+    
+    <!-- Auto-Complete Mention Box & Sticker Panel -->
+    <div class="mention-autocomplete" id="mentionAutocomplete"></div>
+    <div class="sticker-panel" id="stickerPanel">
+      <div class="sticker-grid">
+        <span onclick="sendSticker('🎀')">🎀</span>
+        <span onclick="sendSticker('😈')">😈</span>
+        <span onclick="sendSticker('🌸')">🌸</span>
+        <span onclick="sendSticker('🍮')">🍮</span>
+        <span onclick="sendSticker('🐸')">🐸</span>
+        <span onclick="sendSticker('🐱')">🐱</span>
+        <span onclick="sendSticker('🐶')">🐶</span>
+        <span onclick="sendSticker('🍎')">🍎</span>
+        <span onclick="sendSticker('🍒')">🍒</span>
+        <span onclick="sendSticker('🍓')">🍓</span>
+        <span onclick="sendSticker('🍭')">🍭</span>
+        <span onclick="sendSticker('🧁')">🧁</span>
+      </div>
+    </div>
+
+    <div class="chat-input-row" style="position: relative;">
+      <button class="chat-sticker-btn" id="stickerToggleBtn" onclick="toggleStickerPanel()">💖</button>
+      <input type="text" id="chatInput" placeholder="Ask me something cute... (or use @ to mention!)" onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button class="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SLEEK CAPSULE MUSIC PLAYER (จัดระเบียบปีกกาปิดถูกต้อง) -->
+<div class="capsule-music-player mini-mode" id="capsuleMusicPlayer">
+  
+  <!-- โหมดมินิแคปซูล -->
+  <div class="mini-player-view" id="miniPlayerView" onclick="toggleCapsuleMode('expand')">
+    <div class="mini-album-art-wrapper">
+      <img id="miniAlbumArt" src="https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695" class="mini-art-img spinning" alt="Art">
+      <div class="radar-pulse pulse1"></div>
+      <div class="radar-pulse pulse2"></div>
+      <div class="radar-pulse pulse3"></div>
+    </div>
+    <div class="mini-text-info">
+      <span class="mini-music-label">MUSIC</span>
+      <span class="mini-track-title" id="miniTrackTitle">SANRIO LOFI</span>
+    </div>
+  </div>
+
+  <!-- โหมดแผงคุมเพลงขนาดเต็ม (Expanded Mode) -->
+  <div class="expanded-player-view" id="expandedPlayerView">
+    
+    <!-- แถบหัวข้อยุบหน้าต่าง -->
+    <div class="expanded-header">
+      <div class="now-playing-status">
+        <span class="live-pulse-dot"></span>
+        <span class="status-label">NOW PLAYING</span>
+      </div>
+      <button class="collapse-btn" onclick="toggleCapsuleMode('collapse')">
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    </div>
+
+    <!-- บอดี้ข้อมูลภาพและชื่อเพลงศิลปิน -->
+    <div class="expanded-body-info">
+      <img id="expandedAlbumArt" src="https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695" class="expanded-art-img" alt="Cover">
+      <div class="expanded-text-details">
+        <h4 class="expanded-song-title" id="expandedTrackTitle">SANRIO LOFI</h4>
+        <p class="expanded-artist-name" id="expandedArtistName">SWEET VIBES</p>
+        <div style="width: 100%; height: 50px; margin: 10px 0; display: flex; align-items: center; justify-content: center;">
+  <canvas id="visualizerCanvas" style="width: 100%; height: 100%;"></canvas>
+</div>
+      </div>
+    </div>
+
+    <!-- แถบระยะเวลา Seek Bar เล่นเพลง -->
+    <div class="progress-bar-container">
+      <input type="range" id="progressControl" class="seek-slider" min="0" max="100" value="0">
+      <div class="progress-time-labels">
+        <span id="currentTimeLabel">0:00</span>
+        <span id="totalTimeLabel">0:00</span>
+      </div>
+    </div>
+
+    <!-- ปุ่มควบคุมระดับเสียงและควบคุมเพลง (ล่างสุด) -->
+    <div class="expanded-controls-row">
+      <!-- ฝั่งซ้าย: ปรับระดับเสียง -->
+      <div class="volume-control-wrapper">
+        <button id="capsuleMuteBtn" class="control-btn"><i class="fas fa-volume-up"></i></button>
+        <input type="range" id="capsuleVolumeControl" class="volume-slider-bar" min="0" max="1" step="0.01" value="0.6">
+      </div>
+
+      <!-- ฝั่งขวา: เล่น ย้อนหลัง ถัดไป และปุ่มเลือกคิวเพลง -->
+      <div class="media-controls-wrapper">
+        <button id="capsulePlaylistBtn" class="control-btn mini-sub-btn" onclick="togglePlaylistDropup()"><i class="fas fa-list-ul"></i></button>
+        <button id="capsulePrevBtn" class="control-btn"><i class="fas fa-backward"></i></button>
+        <button id="capsulePlayPauseBtn" class="big-play-pause-btn"><i class="fas fa-play"></i></button>
+        <button id="capsuleNextBtn" class="control-btn"><i class="fas fa-forward"></i></button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- แผงเลือกรายชื่อคิวเพลง (Playlist Dropup) -->
+  <div class="playlist-dropup" id="playlistDropup">
+    <div class="playlist-dropup-title"><i class="fas fa-music"></i> Select Track</div>
+    <div id="playlistDropupItems"></div>
+  </div>
+
+</div>
+
+<script>
+// ===================================================================================
+// KAWAII BUBBLE POP CLICK SOUND (Web Audio API Synth - ไม่พึ่งไฟล์ภายนอก)
+// ===================================================================================
+function playCuteClickSound() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    // เสียงฟองสบู่ป๊อปสุดน่ารักสไตล์คาวาอี้
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1300, audioCtx.currentTime + 0.12);
+    
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.12);
+  } catch (err) {}
+}
+
+// ผูกเสียงคลิกกับทุกปุ่ม และองค์ประกอบที่มีปฏิสัมพันธ์
+document.addEventListener('click', (e) => {
+  const target = e.target;
+  if (target.closest('button') || target.closest('.member-card') || target.closest('a') || target.closest('label') || target.closest('.page-btn') || target.closest('.home-btn') || target.closest('.pixel-char-container') || target.closest('.playlist-item')) {
+    playCuteClickSound();
+  }
+});
+
+// ===================================================================================
+// DAY/NIGHT MODE (คุมทั้งเวลาอัตโนมัติ และสลับธีมแมนนวลผ่านปุ่มกด)
+// ===================================================================================
+let isThemeManuallySet = false;
+
+function updateDayNightMode() {
+  if (isThemeManuallySet) return;
+  const bkkTime = new Date().toLocaleString("en-US", {timeZone: "Asia/Bangkok"});
+  const hour = new Date(bkkTime).getHours();
+  const isDarkTime = (hour >= 18 || hour < 6);
+  
+  if (isDarkTime) {
+    document.body.classList.add('dark-theme');
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> Light Theme';
+  } else {
+    document.body.classList.remove('dark-theme');
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.innerHTML = '<i class="fas fa-moon"></i> Dark Theme';
+  }
+}
+
+function toggleTheme() {
+  isThemeManuallySet = true;
+  const body = document.body;
+  body.classList.toggle('dark-theme');
+  const isCurrentlyDark = body.classList.contains('dark-theme');
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) {
+    btn.innerHTML = isCurrentlyDark ? '<i class="fas fa-sun"></i> Light Theme' : '<i class="fas fa-moon"></i> Dark Theme';
+  }
+}
+
+// สลับหน้าและรันเสียงดนตรีประกอบ
+function triggerMusicAndEffects(e) {
+  try { startMusic(); } catch (err) {}
+  try {
+    const rect = document.getElementById('enter-btn').getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    createBurstEffect(x, y, 25);
+  } catch (err) {}
+  try { renderPage(); } catch (err) {}
+}
+
+function resetSearch() {
+  try {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    currentPage = 1;
+    renderPage();
+  } catch (err) {}
+}
+
+// ===================================================================================
+// SLEEK CAPSULE MUSIC PLAYER SYSTEM (ระบบควบคุมบาร์เพลงอัจฉริยะแบบแคปซูล)
+// ===================================================================================
+
+// รายชื่อเพลง พร้อมศิลปิน และหน้าปกที่อัปเกรดเพื่อรองรับหน้าต่าง Now Playing
+const playlist = [
+  { 
+    name: "Sanrio LoFi Remix", 
+    artist: "Sanrio Vibe",
+    url: "https://files.catbox.moe/ul62nj.mp3",
+    cover: "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695"
+  },
+  { 
+    name: "BUTTERBEAR - น่ารักมั้ยไม่รู้", 
+    artist: "น้องหมีเนย",
+    url: "https://files.catbox.moe/sju845.mp3",
+    cover: "https://www.sanrio.com/cdn/shop/files/572845-Zoom.1_800x.jpg?v=1776971542"
+  },
+  { 
+    name: "มะงึกๆอุ๋งๆ", 
+    artist: "BNK48",
+    url: "https://files.catbox.moe/aoatvt.mp3",
+    cover: "https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317"
+  }
+];
+
+let currentTrack = 0;
+let bgAudio = new Audio();
+let isPlaying = false;
+let isMuted = false;
+let previousVolume = 0.6;
+
+// ฟังก์ชันเปิด-ปิดสลับโหมดแคปซูล (Mini / Expand)
+function toggleCapsuleMode(mode) {
+  const player = document.getElementById('capsuleMusicPlayer');
+  if (player) {
+    if (mode === 'expand') {
+      player.classList.remove('mini-mode');
+      player.classList.add('expanded-mode');
+    } else {
+      player.classList.remove('expanded-mode');
+      player.classList.add('mini-mode');
+    }
+  }
+}
+
+// โหลดเพลงและระบุหน้าปก, ชื่อเพลง, ศิลปิน
+// ฟังก์ชันโหลดเพลงระบบประคองความปลอดภัย (ป้องกันเว็บแครชเมื่อฟิลด์ข้อมูลเพลงไม่ครบ)
+function loadTrack(index) {
+  if (playlist.length === 0) return;
+  currentTrack = index % playlist.length;
+  const track = playlist[currentTrack];
+  const wasPlaying = isPlaying;
+  
+  bgAudio.pause();
+  bgAudio.src = track.url;
+  bgAudio.load();
+  
+  // ระบบประคองความปลอดภัย: หากไม่มีข้อมูลชื่อ ศิลปิน หรือรูปภาพ ให้ใช้ค่าสำรองพาสเทลทันทีโดยไม่แครช
+  const trackName = (track.name || "Unknown Track").toUpperCase();
+  const artistName = (track.artist || "Sanrio Artist").toUpperCase();
+  const coverImg = track.cover || "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695";
+
+  const miniTitle = document.getElementById('miniTrackTitle');
+  const expTitle = document.getElementById('expandedTrackTitle');
+  const expArtist = document.getElementById('expandedArtistName');
+  const miniArt = document.getElementById('miniAlbumArt');
+  const expArt = document.getElementById('expandedAlbumArt');
+
+  if (miniTitle) miniTitle.innerText = trackName;
+  if (expTitle) expTitle.innerText = trackName;
+  if (expArtist) expArtist.innerText = artistName;
+  if (miniArt) miniArt.src = coverImg;
+  if (expArt) expArt.src = coverImg;
+
+  // อัปเดตสถานะไฮไลท์คิวเพลงในป๊อปอัป
+  const items = document.querySelectorAll('.playlist-item');
+  items.forEach((item, idx) => {
+    if (idx === currentTrack) item.classList.add('playing');
+    else item.classList.remove('playing');
+  });
+
+  if (wasPlaying) {
+    bgAudio.play().catch(e => console.log("Play blocked", e));
+  }
+}
+
+function startMusic() {
+  if (playlist.length === 0) return;
+  if (!isPlaying) {
+    if (!bgAudio.src) {
+      loadTrack(currentTrack);
+    }
+    bgAudio.play().then(() => {
+      isPlaying = true;
+      updatePlayPauseButtonUI();
+    }).catch(e => {
+      setupMusicInteraction();
+    });
+  }
+}
+
+function pauseMusic() {
+  if (isPlaying) {
+    bgAudio.pause();
+    isPlaying = false;
+    updatePlayPauseButtonUI();
+  }
+}
+
+function updatePlayPauseButtonUI() {
+  const btn = document.getElementById('capsulePlayPauseBtn');
+  const miniImg = document.getElementById('miniAlbumArt');
+  const player = document.getElementById('capsuleMusicPlayer');
+  
+  if (btn) {
+    btn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+  }
+  // ควบคุมระบบแผ่คลื่นเรดาร์รอบอวตาร์เพลง
+  if (player) {
+    if (isPlaying) {
+      player.classList.add('playing-state');
+    } else {
+      player.classList.remove('playing-state');
+    }
+  }
+  if (miniImg) {
+    if (isPlaying) {
+      miniImg.classList.add('spinning');
+      miniImg.classList.remove('paused');
+    } else {
+      miniImg.classList.add('paused');
+    }
+  }
+}
+
+function setupMusicInteraction() {
+  const startPlayOnInteraction = () => {
+    bgAudio.play().then(() => {
+      isPlaying = true;
+      updatePlayPauseButtonUI();
+    }).catch(()=>{});
+    document.body.removeEventListener('click', startPlayOnInteraction);
+  };
+  document.body.addEventListener('click', startPlayOnInteraction, { once: true });
+}
+
+function nextTrack() {
+  currentTrack = (currentTrack + 1) % playlist.length;
+  loadTrack(currentTrack);
+  if (isPlaying) bgAudio.play().catch(()=>{});
+}
+
+function prevTrack() {
+  currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+  loadTrack(currentTrack);
+  if (isPlaying) bgAudio.play().catch(()=>{});
+}
+
+// อัปเดตแถบความก้าวหน้า Seek Bar ความยาวเพลง
+function formatTime(seconds) {
+  if (isNaN(seconds)) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+bgAudio.addEventListener('timeupdate', () => {
+  const progressControl = document.getElementById('progressControl');
+  const currentTimeLabel = document.getElementById('currentTimeLabel');
+  const totalTimeLabel = document.getElementById('totalTimeLabel');
+  
+  if (progressControl && bgAudio.duration) {
+    const percentage = (bgAudio.currentTime / bgAudio.duration) * 100;
+    progressControl.value = percentage;
+    currentTimeLabel.innerText = formatTime(bgAudio.currentTime);
+    totalTimeLabel.innerText = formatTime(bgAudio.duration);
+  }
+});
+
+// เลื่อนกดยัดเวลาความยาวเพลง
+const progressControl = document.getElementById('progressControl');
+if (progressControl) {
+  progressControl.addEventListener('input', (e) => {
+    if (bgAudio.duration) {
+      const newTime = (e.target.value / 100) * bgAudio.duration;
+      bgAudio.currentTime = newTime;
+    }
+  });
+}
+
+// ระบบเสียง
+function setVolume(value) {
+  let vol = parseFloat(value);
+  if (isNaN(vol)) vol = 0.6;
+  bgAudio.volume = vol;
+  document.getElementById('capsuleVolumeControl').value = vol;
+  const muteBtn = document.getElementById('capsuleMuteBtn');
+  if (vol === 0) {
+    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    isMuted = true;
+  } else {
+    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    isMuted = false;
+  }
+}
+
+function toggleMute() {
+  const muteBtn = document.getElementById('capsuleMuteBtn');
+  const volumeSlider = document.getElementById('capsuleVolumeControl');
+  if (isMuted) {
+    bgAudio.volume = previousVolume;
+    volumeSlider.value = previousVolume;
+    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    isMuted = false;
+  } else {
+    previousVolume = bgAudio.volume;
+    bgAudio.volume = 0;
+    volumeSlider.value = 0;
+    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    isMuted = true;
+  }
+}
+
+// เปิดคิวคัดเลือกรายชื่อเพลง
+function togglePlaylistDropup() {
+  const dropup = document.getElementById('playlistDropup');
+  if (dropup) {
+    dropup.classList.toggle('active');
+  }
+}
+
+function initPlaylistDropup() {
+  const container = document.getElementById('playlistDropupItems');
+  if (container) {
+    container.innerHTML = '';
+    playlist.forEach((track, idx) => {
+      const item = document.createElement('div');
+      item.className = 'playlist-item' + (idx === currentTrack ? ' playing' : '');
+      item.innerText = `${idx + 1}. ${track.name}`;
+      item.addEventListener('click', () => {
+        loadTrack(idx);
+        startMusic();
+        document.getElementById('playlistDropup').classList.remove('active');
+      });
+      container.appendChild(item);
+    });
+  }
+}
+
+
+// ผูกฟังก์ชันเข้ากับหน้าต่างคลิก
+// ผูกฟังก์ชันเข้ากับหน้าต่างคลิก
+document.addEventListener('DOMContentLoaded', () => {
+  initPlaylistDropup(); // <-- เพิ่มบรรทัดนี้ลงไปตรงนี้เพื่อเรียกทำงานระบบคิวเพลงครับ!
+  
+  const playBtn = document.getElementById('capsulePlayPauseBtn');
+  if (playBtn) playBtn.addEventListener('click', () => { if (isPlaying) pauseMusic(); else startMusic(); });
+  
+  const nextBtn = document.getElementById('capsuleNextBtn');
+  if (nextBtn) nextBtn.addEventListener('click', nextTrack);
+
+  const prevBtn = document.getElementById('capsulePrevBtn');
+  if (prevBtn) prevBtn.addEventListener('click', prevTrack);
+
+  const volSlider = document.getElementById('capsuleVolumeControl');
+  if (volSlider) volSlider.addEventListener('input', (e) => setVolume(e.target.value));
+
+  const muteBtn = document.getElementById('capsuleMuteBtn');
+  if (muteBtn) muteBtn.addEventListener('click', toggleMute);
+
+  // คลิกพื้นที่ด้านนอกเพื่อปิดเมนูคิวเพลงอัตโนมัติ
+  document.addEventListener('click', (e) => {
+    const dropup = document.getElementById('playlistDropup');
+    const playlistBtn = document.getElementById('capsulePlaylistBtn');
+    if (dropup && !dropup.contains(e.target) && e.target !== playlistBtn && !playlistBtn.contains(e.target)) {
+      dropup.classList.remove('active');
+    }
+  });
+
+  bgAudio.addEventListener('ended', nextTrack);
+
+  // โหลดเพลงแรกไว้รอคิวเล่น
+  loadTrack(currentTrack);
+});
+
+
+// ========== MEMBERS DATA (EMBEDDED fallback) ==========
+let membersData = [
+  { "name": "Werkk Sanrio", "role": "Owner", "facebook": "https://www.facebook.com/Werkk.nba", "img": "https://www.sanrio.com/cdn/shop/files/198445178610_800x.png?v=1749746553", "bio": "ยินดีต้อนรับเพื่อนๆ ทุกคนเข้าสู่โลกแห่งจินตนาการพาสเทลแสนอบอุ่นมาร่วมสนุกไปด้วยกันเถอะนะ!", "favChar": "Hello Kitty 🎀", "insta": "https://instagram.com/kitty" },
+  { "name": "NongDell Sanrio", "role": "Leader", "facebook": "https://www.facebook.com/nongdelll", "img": "https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317", "bio": "แสงดาวเปล่งประกายระยิบระยับนำทางให้เราได้มาเจอเพื่อนใหม่ในทุกๆ วันที่แสนวิเศษ", "favChar": "Hello Kitty 🎀", "insta": "https://instagram.com/kitty" },
+  { "name": "NongGule Sanrio", "role": "Leader", "facebook": "https://www.facebook.com/guel.pemberton", "img": "https://www.sanrio.com/cdn/shop/files/572845-Zoom.1_800x.jpg?v=1776971542", "bio": "สไตล์ย้อนยุคแสนคลาสสิกที่ทุกคนคิดถึง ร่วมแบ่งปันความสุขข้ามกาลเวลาด้วยหัวใจดวงโต", "favChar": "Hello Kitty Classic 🍎", "insta": "https://instagram.com/kitty" },
+  { "name": "Well Sanrio", "role": "Leader", "facebook": "https://www.facebook.com/profile.php?id=61589183401521", "img": "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695", "bio": "ส่งต่อรอยยิ้มแสนหวานและดอกไม้ที่สดใสให้กับเพื่อนๆ ทุกคนที่มาเยี่ยมชมเว็บบอร์ดของเรานะคะ", "favChar": "My Melody 🌸", "insta": "https://instagram.com/mymelody" },
+  { "name": "Martin Sanrio", "role": "Leader", "facebook": "https://www.facebook.com/Nongmartin.wanttogetAIDS", "img": "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695", "bio": "ความอ่อนโยนคือพลังที่ยิ่งใหญ่ ขอให้วันนี้เป็นวันที่ดีและมีความสุขตลอดวันค่ะ", "favChar": "My Melody 🌸", "insta": "https://instagram.com/mymelody" },
+  { "name": "Payu Sanrio", "role": "Leader", "facebook": "https://www.facebook.com/zent.bangbath", "img": "https://www.sanrio.com/cdn/shop/files/198445178610_800x.png?v=1749746553", "bio": "กระโดดโลดเต้นไปตามจังหวะเสียงดนตรีสดใสพาสเทล มาโยกย้ายความเครียดออกไปกันเถอะค่ะ!", "favChar": "My Melody Classic 💕", "insta": "https://mymelody" },
+  { "name": "Kuromi", "role": "member", "facebook": "https://www.facebook.com/sario.kuromi", "img": "https://www.sanrio.com/cdn/shop/files/198445178610_800x.png?v=1749746553", "bio": "ไงยัยพวกเด็กดื้อ! คิดจะท้าทายหัวหน้าแก๊งอย่างนั้นเหรอ? มาพิสูจน์พลังคุโรมิกันหน่อยเซ่!", "favChar": "Kuromi 😈", "insta": "https://instagram.com/kuromi" },
+  { "name": "Kuromi (Crystal Gothic)", "role": "member", "facebook": "https://www.facebook.com/sario.kuromi", "img": "https://www.sanrio.com/cdn/shop/files/198445178610_800x.png?v=1749746553", "bio": "ศิลปะความโกธิคแสนลึกลับแต่เปี่ยมไปด้วยเสน่ห์ที่น่าค้นหา ใครดื้อระวังโดนแกล้งนะจ๊ะ", "favChar": "Kuromi 😈", "insta": "https://instagram.com/kuromi" },
+  { "name": "Kuromi (Cheeky Smile)", "role": "member", "facebook": "https://www.facebook.com/sario.kuromi", "img": "https://www.sanrio.com/cdn/shop/files/572900-Zoom.1_800x.jpg?v=1776971678", "bio": "รอยยิ้มแสนเจ้าเล่ห์แต่รักนะเออ! ชอบสะสมนิยายโรแมนติกและสร้างความปั่นป่วนสุดน่ารัก", "favChar": "Kuromi Classic 🖤", "insta": "https://instagram.com/kuromi" },
+  { "name": "Cinnamoroll", "role": "member", "facebook": "https://www.facebook.com/sario.cinnamoroll", "img": "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695", "bio": "ล่องลอยอยู่บนปุยเมฆขาวและโบกหูบินไปมาอย่างร่าเริง มีกลิ่นอายคาเฟ่และเบเกอรี่แสนหอมหวาน", "favChar": "Cinnamoroll ☁️", "insta": "https://instagram.com/cinnamon" },
+  { "name": "Pompompurin", "role": "member", "facebook": "https://www.facebook.com/sario.pompompurin", "img": "https://www.sanrio.com/cdn/shop/files/572845-Zoom.1_800x.jpg?v=1776971542", "bio": "เจ้าตูบพุดดิ้งสีเหลืองแสนขี้เล่น ชื่นชอบการผจญภัยและการนอนกลางวันเป็นชีวิตจิตใจเลยโฮ่ง!", "favChar": "Pompompurin 🍮", "insta": "https://instagram.com/purin" },
+  { "name": "Pochacco", "role": "member", "facebook": "https://www.facebook.com/sario.pochacco", "img": "https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317", "bio": "เจ้าลูกหมาที่รักกีฬาและการกินไอศกรีมกล้วยเป็นที่สุด วิ่งเล่นในทุ่งหญ้าสดใสกับเพื่อนฝูง", "favChar": "Pochacco 🐶", "insta": "https://instagram.com/pochacco" },
+  { "name": "Keroppi", "role": "member", "facebook": "https://www.facebook.com/sario.keroppi", "img": "https://www.sanrio.com/cdn/shop/files/572896-Zoom.1_800x.jpg?v=1776971647", "bio": "กบหนุ่มพลังล้นเหลือจากบึงโดนัท ชอบร้องเพลงและว่ายน้ำผจญภัยท่ามกลางสายฝนชุ่มฉ่ำ", "favChar": "Keroppi 🐸", "insta": "https://instagram.com/kero" },
+  { "name": "Badtz-Maru", "role": "member", "facebook": "https://www.facebook.com/sario.badtz", "img": "https://www.sanrio.com/cdn/shop/files/572900-Zoom.1_800x.jpg?v=1776971678", "bio": "เพนกวินมาดกวนที่มีเพื่อนรักเป็นแมวน้ำแสนน่ารัก ชื่นชอบของหรูหราแต่แอบขี้งอนไปหน่อยนะ", "favChar": "Badtz-Maru 🐧", "insta": "https://instagram.com/badtz" },
+  { "name": "Tuxedo Sam", "role": "member", "facebook": "https://www.facebook.com/sario.tuxedosam", "img": "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695", "bio": "สุภาพบุรุษเพนกวินผู้มีหูกระต่ายและหมวกกะลาสีสะสมไว้กว่า 365 ใบ ดูดีมีระดับอยู่เสมอ", "favChar": "Tuxedo Sam ⚓", "insta": "https://instagram.com/sam" },
+  { "name": "Hangyodon", "role": "member", "facebook": "https://www.facebook.com/sario.hangyodon", "img": "https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317", "bio": "หนุ่มครึ่งคนครึ่งปลาที่ใฝ่ฝันอยากเป็นฮีโร่สุดเท่ แม้ว่าภายนอกจะดูแปลกตาแต่หัวใจอ่อนโยนมากนะ", "favChar": "Hangyodon 🐟", "insta": "https://instagram.com/hangyo" },
+  { "name": "Chococat", "role": "member", "facebook": "https://www.facebook.com/sario.chococat", "img": "https://www.sanrio.com/cdn/shop/files/572845-Zoom.1_800x.jpg?v=1776971542", "bio": "เจ้าเหมียวสีช็อกโกแลตผู้มีหนวดรับสัญญาณความรู้สึกรอบตัวได้รวดเร็ว สนุกกับการเรียนรู้สิ่งใหม่ๆ", "favChar": "Chococat 🐱", "insta": "https://instagram.com/chococat" }
+];
+
+// ========== MEMBERS SYSTEM & SEARCH LOGIC ==========
+const landing = document.getElementById('landing');
+const membersPage = document.getElementById('members');
+const searchInput = document.getElementById('searchInput');
+const leadersGrid = document.getElementById('leadersGrid');
+const membersGrid = document.getElementById('membersGrid');
+const ownerGrid = document.getElementById('ownerGrid');
+const pagination = document.getElementById('pagination');
+const ownerSection = document.getElementById('ownerSection');
+const leadersSection = document.getElementById('leadersSection');
+const memberCountEl = document.getElementById('memberCount');
+
+let currentPage = 1;
+
+if (window.location.protocol !== 'file:') {
+  fetch('members.json')
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.length > 0) {
+        membersData = data.map(m => {
+          const matched = membersData.find(item => item.name === m.name);
+          return {
+            ...m,
+            bio: m.bio || (matched ? matched.bio : "- No bio available -"),
+            favChar: m.favChar || (matched ? matched.favChar : "Sanrio Character"),
+            insta: m.insta || (matched ? matched.insta : "https://instagram.com/")
+          };
+        });
+      }
+      renderPage();
+    })
+    .catch(err => {
+      renderPage();
+    });
+} else {
+  renderPage();
+}
+
+function renderPage(){
+  if (!memberCountEl) return;
+  if(!membersData.length) {
+    memberCountEl.innerText=`Members: 0`;
+    return;
+  }
+  const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
+  
+  // ค้นหาร่วมกันจริงครบทุกหมวดหมู่ตำแหน่ง
+  let owners = membersData.filter(m => m && m.role && m.role.toLowerCase() === 'owner');
+  let leaders = membersData.filter(m => m && m.role && m.role.toLowerCase().includes('leader'));
+  let membersOnly = membersData.filter(m => m && m.role && !m.role.toLowerCase().includes('leader') && m.role.toLowerCase() !== 'owner');
+  
+  if (searchVal) {
+    owners = owners.filter(m => m && m.name && m.name.toLowerCase().includes(searchVal));
+    leaders = leaders.filter(m => m && m.name && m.name.toLowerCase().includes(searchVal));
+    membersOnly = membersOnly.filter(m => m && m.name && m.name.toLowerCase().includes(searchVal));
+  }
+
+  memberCountEl.innerText=`Members: ${membersData.length}`;
+
+  let itemsPerPage = currentPage===1 ? 11 : 33;
+
+  if(currentPage===1){
+    if (owners.length > 0) {
+      if (ownerSection) ownerSection.style.display='block';
+      if (ownerGrid) {
+        ownerGrid.innerHTML='';
+        owners.forEach((m,i)=>setTimeout(()=>{const card=createCard(m); card.classList.add('show'); ownerGrid.appendChild(card);}, i*50));
+      }
+    } else {
+      if (ownerSection) ownerSection.style.display='none';
+    }
+
+    if (leaders.length > 0) {
+      if (leadersSection) leadersSection.style.display='block';
+      if (leadersGrid) {
+        leadersGrid.innerHTML='';
+        leaders.forEach((m,i)=>setTimeout(()=>{const card=createCard(m); card.classList.add('show'); leadersGrid.appendChild(card);}, i*50));
+      }
+    } else {
+      if (leadersSection) leadersSection.style.display='none';
+    }
+  } else {
+    if (ownerSection) ownerSection.style.display='none';
+    if (leadersSection) leadersSection.style.display='none';
+  }
+
+  if (membersGrid) {
+    membersGrid.innerHTML='';
+    let startIdx = currentPage===1 ? 0 : 11+(currentPage-2)*33;
+    let endIdx = startIdx+itemsPerPage;
+    const paginatedMembers = membersOnly.slice(startIdx,endIdx);
+    
+    if(paginatedMembers.length > 0) {
+      document.getElementById('membersSection').style.display = 'block';
+      paginatedMembers.forEach((m,i)=>setTimeout(()=>{const card=createCard(m); card.classList.add('show'); membersGrid.appendChild(card);}, i*50));
+    } else {
+      document.getElementById('membersSection').style.display = 'none';
+    }
+  }
+
+  if (pagination) {
+    pagination.innerHTML='';
+    const totalPages = Math.max(1,Math.ceil((membersOnly.length-11)/33)+1);
+    for(let i=1;i<=totalPages;i++){
+      const btn=document.createElement('button');
+      btn.className='page-btn'+(i===currentPage?' active':'');
+      btn.innerText=i;
+      btn.addEventListener('click',()=>{currentPage=i;renderPage();});
+      pagination.appendChild(btn);
+    }
+  }
+}
+
+function createCard(m){
+  const card=document.createElement('div');
+  
+  let rankClass = 'member-card-blue';
+  if (m.role && m.role.toLowerCase() === 'owner') {
+    rankClass = 'owner-card';
+  } else if (m.role && m.role.toLowerCase().includes('leader')) {
+    rankClass = 'leader-card';
+  }
+  
+  card.className = 'member-card parallax ' + rankClass;
+  card.addEventListener('click', (e) => {
+    if (!e.target.closest('.card-fb-link')) {
+      openProfileModal(m);
+    }
+  });
+  
+  let fbDisplay = m.facebook ? m.facebook.replace('https://www.facebook.com/', 'facebook.com/') : 'facebook.com';
+  fbDisplay = fbDisplay.split('#')[0].split('?')[0]; 
+
+  let badgeIcon = '<i class="fas fa-ribbon"></i>';
+  if(m.role && m.role.toLowerCase() === 'owner') {
+    badgeIcon = '<i class="fas fa-star"></i>';
+  } else if(m.role && m.role.toLowerCase().includes('leader')) {
+    badgeIcon = '<i class="fas fa-heart"></i>';
+  }
+
+  // สร้างโครงสร้างการ์ดพร้อมใส่ระบบป๊อปอัป (profile-hover-card) รอไว้ข้างใน
+  card.innerHTML=`
+    <div class="holo-overlay"></div>
+
+    <div class="card-top-content">
+      <div class="skeleton" data-loaded="false">
+        <img src="${m.img}" alt="${m.name}">
+      </div>
+      <h3>${m.name}</h3>
+      <p>${m.role}</p>
+    </div>
+    
+    <a class="card-fb-link" href="${m.facebook}" target="_blank">
+      <i class="fab fa-facebook"></i> facebook
+    </a>
+
+    <!-- โครงสร้างระบบป๊อปอัปโปรไฟล์ -->
+    <div class="profile-hover-card">
+      <div class="card-header-bg">
+        <div class="card-avatar">
+          <img class="popover-avatar-img" src="${m.img}" alt="${m.name}">
+        </div>
+        <div class="card-fb-watermark">
+          <i class="fas fa-heart"></i>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3 class="card-name">${m.name}</h3>
+        <p class="card-username">${fbDisplay}</p>
+        <span class="card-badge">
+          ${badgeIcon} ${m.role ? m.role.toUpperCase() : ''}
+        </span>
+        <button class="view-profile-btn" style="border:none; width:100%;">
+          <i class="fas fa-external-link-alt"></i> View Profile
+        </button>
+      </div>
+    </div>
+  `;
+  
+  const skeleton=card.querySelector('.skeleton');
+  const img=skeleton.querySelector('img');
+  const popoverImg = card.querySelector('.popover-avatar-img');
+  
+  img.addEventListener('load',()=>{
+    skeleton.style.animation='none';
+    img.style.display='block';
+    img.style.opacity=0;
+    img.style.transition='opacity .35s ease';
+    requestAnimationFrame(()=>{img.style.opacity=1;});
+  });
+  
+  const handleImageError = () => {
+    skeleton.style.background='#fff0f3';
+    skeleton.innerHTML='<i class="fas fa-paw" style="font-size:28px;color:#ffcbd5"></i>';
+    if(popoverImg) {
+      popoverImg.parentElement.innerHTML = '<i class="fas fa-paw" style="font-size:20px;color:#ffcbd5;display:flex;align-items:center;justify-content:center;height:100%;width:100%;background:#fff0f3;"></i>';
+    }
+  };
+
+  img.addEventListener('error', handleImageError);
+  if(popoverImg) {
+    popoverImg.addEventListener('error', handleImageError);
+  }
+  
+  return card;
+}
+
+// DETAILED PROFILE MODAL LOGIC
+function openProfileModal(m) {
+  const modal = document.getElementById('profileModal');
+  const avatar = document.getElementById('modalAvatar');
+  const name = document.getElementById('modalName');
+  const badges = document.getElementById('modalBadges');
+  const bio = document.getElementById('modalBio');
+  const favChar = document.getElementById('modalFavChar');
+  const fbLink = document.getElementById('modalFbLink');
+  const instaLink = document.getElementById('modalInstaLink');
+  const instaRow = document.getElementById('modalInstaRow');
+  const actionFb = document.getElementById('modalActionFb');
+
+  if (modal) {
+    avatar.src = m.img || 'https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317';
+    name.innerText = m.name;
+    bio.innerText = m.bio || "ขอต้อนรับสู่โปรไฟล์ของฉัน ยินดีที่ได้รู้จักเพื่อนๆ ทุกคนนะ!";
+    favChar.innerText = m.favChar || "Hello Kitty 🎀";
+    
+    let roleIcon = '<i class="fas fa-ribbon"></i>';
+    if (m.role && m.role.toLowerCase() === 'owner') roleIcon = '<i class="fas fa-star"></i>';
+    else if (m.role && m.role.toLowerCase().includes('leader')) roleIcon = '<i class="fas fa-heart"></i>';
+
+    badges.innerHTML = `
+      <span class="card-badge" style="margin-bottom:0;">${roleIcon} ${m.role ? m.role.toUpperCase() : 'MEMBER'}</span>
+    `;
+
+    fbLink.href = m.facebook || '#';
+    fbLink.innerText = m.facebook ? m.facebook.replace('https://www.facebook.com/', 'facebook.com/') : 'Link';
+    actionFb.href = m.facebook || '#';
+
+    if (m.insta) {
+      instaRow.style.display = 'flex';
+      instaLink.href = m.insta;
+      instaLink.innerText = m.insta.replace('https://instagram.com/', '@');
+    } else {
+      instaRow.style.display = 'none';
+    }
+
+    modal.classList.add('active');
+  }
+}
+
+function closeProfileModal() {
+  const modal = document.getElementById('profileModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+if (searchInput) searchInput.addEventListener('input',()=>{currentPage=1;renderPage();});
+
+// ===================================================================================
+// 3D HOLOGRAPHIC CARD PARALLAX ROTATE EFFECT (การ์ดเอียงสมจริงตามทิศทางเมาส์พร้อมเหลือบแสงรุ้ง)
+// ===================================================================================
+function initHoloCardEffect() {
+  document.addEventListener('mousemove', (e) => {
+    const card = e.target.closest('.member-card');
+    if (!card) return;
+    
+    // กฎสำคัญ: ถ้าเมาส์กำลังอยู่บนพื้นที่ป๊อปอัป ให้ล็อคการ์ดอยู่นิ่งๆ แบบแบนปกติ ไม่ต้องหมุนหนีเมาส์
+    if (e.target.closest('.profile-hover-card')) {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1.05, 1.05, 1.05)';
+      return;
+    }
+    
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left; 
+    const y = e.clientY - rect.top;  
+    const w = rect.width;
+    const h = rect.height;
+    
+    // ถ้าเมาส์หลุดออกนอกพิกัดการ์ดหลัก ให้ล็อคการ์ดไม่เอียงสะบัดเช่นกัน
+    if (x < 0 || x > w || y < 0 || y > h) {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1.05, 1.05, 1.05)';
+      return;
+    }
+    
+    // คำนวณอัตราส่วนการเอียงมิติ (-15 ถึง 15 องศา)
+    const rx = -((y - h / 2) / (h / 2)) * 15;
+    const ry = ((x - w / 2) / (w / 2)) * 15;
+    
+    card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale3d(1.05, 1.05, 1.05)`;
+    
+    const holo = card.querySelector('.holo-overlay');
+    if (holo) {
+      const px = (x / w) * 100;
+      const py = (y / h) * 100;
+      holo.style.backgroundPosition = `${px}% ${py}%`;
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    const card = e.target.closest('.member-card');
+    if (card && !card.contains(e.relatedTarget)) {
+      card.style.transform = '';
+      const holo = card.querySelector('.holo-overlay');
+      if (holo) {
+        holo.style.backgroundPosition = '50% 50%';
+      }
+    }
+  });
+}
+
+// ========== CUSTOM INTERACTIVE EFFECT ==========
+
+// 1. ระเบิดหัวใจและดาวพุ่งกระจายเมื่อเมาส์คลิก
+function createBurstEffect(x, y, count = 10) {
+  try {
+    const shapes = ['🌸', '✨', '♥', '⭐', '🎀', '🎈'];
+    const colors = ['#ff8fa3', '#ffb3c1', '#ffa6c9', '#a2d2ff', '#ffc6ff', '#e8f0fe'];
+    
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'custom-particle';
+      el.innerText = shapes[Math.floor(Math.random() * shapes.length)];
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.fontSize = (Math.random() * 12 + 12) + 'px';
+      
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * 80 + 30;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance;
+      const rotation = Math.random() * 360 + 'deg';
+      
+      el.style.setProperty('--dx', dx + 'px');
+      el.style.setProperty('--dy', dy + 'px');
+      el.style.setProperty('--rot', rotation);
+      
+      el.style.left = x + 'px';
+      el.style.top = y + window.scrollY + 'px';
+      
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 800);
+    }
+  } catch(err) {}
+}
+
+document.addEventListener('click', (e) => {
+  try {
+    const isButton = e.target.id === 'enter-btn' || (e.target.closest && e.target.closest('#enter-btn'));
+    if (!isButton) {
+      createBurstEffect(e.clientX, e.clientY, 8);
+    }
+  } catch(err) {}
+});
+
+// 2. ปล่อยฝุ่นดวงดาวลอยตามเมาส์
+let lastTrailTime = 0;
+document.addEventListener('mousemove', (e) => {
+  try {
+    const now = Date.now();
+    if (now - lastTrailTime < 50) return;
+    lastTrailTime = now;
+    
+    const shapes = ['🌸', '✨', '♥', '⭐'];
+    const colors = ['#ffccd5', '#ffafcc', '#bde0fe', '#ffc6ff'];
+    
+    const el = document.createElement('div');
+    el.className = 'trail-dot';
+    el.innerText = shapes[Math.floor(Math.random() * shapes.length)];
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.left = e.clientX + 'px';
+    el.style.top = (e.clientY + window.scrollY) + 'px';
+    
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 600);
+  } catch(err) {}
+});
+
+// 3. ฝนกลีบซากุระร่วงหล่นทั่วหน้าจอ
+function initFallingEffects() {
+  const elements = ['🌸', '🌸', '💖', '💕', '💗', '💮'];
+  const colors = ['#ffccd5', '#ffafcc', '#bde0fe', '#ffc6ff'];
+  
+  setInterval(() => {
+    if (document.hidden) return; 
+    
+    const leaf = document.createElement('div');
+    leaf.className = 'falling-leaf';
+    leaf.innerText = elements[Math.floor(Math.random() * elements.length)];
+    
+    const size = Math.random() * 16 + 12; 
+    leaf.style.fontSize = size + 'px';
+    
+    if (leaf.innerText !== '🌸' && leaf.innerText !== '💮') {
+      leaf.style.color = colors[Math.floor(Math.random() * colors.length)];
+    } else {
+      leaf.style.color = '#ffb3c1';
+    }
+    
+    leaf.style.left = Math.random() * 100 + 'vw';
+    const duration = Math.random() * 6 + 6; 
+    leaf.style.animationDuration = duration + 's';
+    
+    const driftX = (Math.random() * 160 - 80) + 'px';
+    leaf.style.setProperty('--drift-x', driftX);
+    leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
+    
+    document.body.appendChild(leaf);
+    setTimeout(() => { leaf.remove(); }, duration * 1000);
+  }, 350);
+}
+
+// 4. สติ๊กเกอร์พาสเทลน่ารักลอยขึ้นจากส่วนล่าง
+function initFloatingStickers() {
+  const stickers = ['🧸', '🎀', '🍒', '🍓', '🍭', '🧁', '🌟', '🍩', '🍼', '🍡'];
+  setInterval(() => {
+    if (document.hidden) return;
+    const sticker = document.createElement('div');
+    sticker.className = 'floating-sticker';
+    sticker.innerText = stickers[Math.floor(Math.random() * stickers.length)];
+    sticker.style.left = Math.random() * 95 + 'vw';
+    
+    const size = Math.random() * 20 + 20; 
+    sticker.style.fontSize = size + 'px';
+    const duration = Math.random() * 10 + 12; 
+    sticker.style.animationDuration = duration + 's';
+    
+    document.body.appendChild(sticker);
+    setTimeout(() => { sticker.remove(); }, duration * 1000);
+  }, 3000);
+}
+
+function showRandomWelcomeMessage() {
+  const welcomeMessages = [
+    "Hi Cutie! ✨",
+    "Welcome back ♡ 🎀",
+    "Enjoy the music~ 🎵"
+  ];
+  const randomMsg = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+  const toast = document.getElementById('cute-welcome-toast');
+  const toastText = document.getElementById('toast-message-text');
+  if (toast && toastText) {
+    toastText.innerText = randomMsg;
+    setTimeout(() => {
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }, 1000);
+  }
+}
+
+// BKK LIVE CLOCK & ONLINE COUNTER
+function updateLiveClock() {
+  const clockEl = document.getElementById('liveClock');
+  if (clockEl) {
+    const now = new Date();
+    
+    // คำนวณหาเวลาสากล (UTC) แล้วบวกเพิ่ม 7 ชั่วโมงเพื่อให้เป็นเวลาประเทศไทยเสมอ
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const bkkTime = new Date(utc + (3600000 * 7)); 
+    
+    // ดึงชั่วโมง นาที วินาที และเติมเลข 0 นำหน้ากรณีเป็นเลขหลักเดียว
+    const hours = String(bkkTime.getHours()).padStart(2, '0');
+    const minutes = String(bkkTime.getMinutes()).padStart(2, '0');
+    const seconds = String(bkkTime.getSeconds()).padStart(2, '0');
+    
+    clockEl.innerText = `${hours}:${minutes}:${seconds}`;
+  }
+}
+
+let mockOnlineCount = 28;
+function updateOnlineCounter() {
+  const counterEl = document.getElementById('onlineCounter');
+  if (counterEl) {
+    const drift = Math.floor(Math.random() * 5) - 2; 
+    mockOnlineCount = Math.max(10, Math.min(100, mockOnlineCount + drift));
+    counterEl.innerHTML = `<i class="fas fa-users"></i> Online: ${mockOnlineCount}`;
+  }
+}
+
+// ===================================================================================
+// DOUBLE AI CHATBOT LOGIC (อัปเกรด Typing Indicator, พิมพ์ทีละตัว, สุ่มคำตอบ, Mention)
+// ===================================================================================
+let activeBot = 'melody'; 
+const botDetails = {
+  melody: {
+    name: "My Melody 🌸",
+    avatar: "https://www.sanrio.com/cdn/shop/files/198445178603_800x.png?v=1749746695",
+    styleClass: "melody-style",
+    welcome: "สวัสดีค่ะเพื่อนรัก! เมโลดี้ดีใจจังที่คุณเข้ามาคุยด้วย วันนี้เหนื่อยไหมคะ? 🌸",
+    responses: {
+      "hello": [
+        "สวัสดีค่ะ! วันนี้มีเรื่องสนุกๆ มาเล่าให้เมโลดี้ฟังบ้างไหมคะ? ✨",
+        "ฮัลโหลลล วันนี้อากาศดีจังเลยเนอะ ได้เจอคุณด้วย ดีใจจัง! 💕",
+        "สวัสดีค่ะเพื่อนรัก! วันนี้ทานอะไรอร่อยๆ หรือยังคะ? 🍰"
+      ],
+      "สวัสดี": [
+        "สวัสดีค่ะเพื่อนรัก! เมโลดี้ขอส่งอ้อมกอดแสนอุ่นให้นะคะ ♡",
+        "สวัสดีค่ะ! ขอให้วันนี้เป็นวันที่ใจดีกับคุณที่สุดเลยน้า 🌸",
+        "ยินดีต้อนรับกลับบ้านนะคะเพื่อนรัก วันนี้คิดถึงเมโลดี้ไหมคะ? ✨"
+      ],
+      "น่ารัก": [
+        "ขอบคุณมากๆ เลยนะคะ คุณเองก็น่ารักที่สุดในโลกเหมือนกันค่ะ 🎀",
+        "งื้อออ พูดแบบนี้เมโลดี้เขินจนหูพับหมดแล้วนะ! 🌸",
+        "คนน่ารักชมกันแบบนี้ เมโลดี้ก็ใจฟูสิคะ 💕"
+      ],
+      "เหนื่อย": [
+        "สู้ๆ นะคะคนเก่ง! พักผ่อนทานขนมหวานอร่อยๆ แล้วค่อยลุยกันใหม่น้า 🧁",
+        "โอ๋เอ๋นะคะ... พักสายตา เอนหลังสักนิด เมโลดี้จะคอยนวดไหล่ให้เองค่ะ 🤍",
+        "ถ้าเหนื่อยนักก็แวะมาพักใจฟังเพลงน่ารักๆ ที่นี่ก่อนได้ตลอดเวลาเลยนะคะ ✨"
+      ],
+      "รัก": [
+        "เมโลดี้ก็รักคุณมากๆ เหมือนกันค่ะ! ขอบคุณที่เป็นเพื่อนรักกันเสมอนะคะ 💕",
+        "ความรักของคุณส่งมาถึงหัวใจเมโลดี้แล้วค่ะ! รักที่สุดเลยยยย 🎀",
+        "รักนะคะเพื่อนรักคนเก่งของเมโลดี้! จุ๊บๆ ✨"
+      ],
+      "เพลง": [
+        "เพลงในบอร์ดเพราะมากเลยเนอะ! นั่งฟังคลายเครียดกันเถอะค่ะ 🎵",
+        "ท่วงทำนองหวานละมุนเหมาะกับคนน่ารักแบบคุณที่สุดเลยค่ะ 🌸",
+        "มาขยับตัวเต้นระบำไปตามเสียงเพลงน่ารักๆ กับเมโลดี้ไหมคะ? ✨"
+      ],
+      "จีบ": [
+        "หืม~ จะจีบเมโลดี้จริงเหรอคะ แอบเขินจังเลยค่ะ 💕",
+        "ถ้าจะจีบเมโลดี้ ต้องเตรียมสตรอว์เบอร์รี่หวานๆ มาส่งส่วยให้เยอะๆ น้า 🍓",
+        "งื้อออ จีบเมโลดี้ดื้อๆ แบบนี้ เมโลดี้ก็ไปต่อไม่ถูกสิคะ 🌸"
+      ],
+      "เขิน": ["อย่าพูดแบบนั้นสิคะ เมโลดี้เขินนะ 🎀", "งื้อออ แก้มเมโลดี้จะแดงหมดแล้วค่ะ 🌸"],
+      "กอด": ["มากอดกันหน่อยไหมคะ 🤍", "ส่งอ้อมกอดแสนอุ่นให้ฟืดใหญ่เลยค่ะ! ✨"],
+      "หอม": ["งื้ออ เขินหมดแล้วนะ 🌸", "อุ๊ย! แก้มเมโลดี้ร้อนผ่าวเลยค่ะ 😳"],
+      "เหงา": ["คืนนี้ให้เมโลดี้อยู่เป็นเพื่อนไหมคะ 🤍", "ไม่ต้องเหงาน้า เมโลดี้จะคอยอยู่เคียงข้างคุณเสมอค่ะ 🎀"],
+      "ฝันถึง": ["คืนนี้ฝันถึงเมโลดี้ด้วยนะคะ 🌙", "แล้วมาพบกันในความฝันหวานน้า ✨"],
+      "งอน": ["ง้อเมโลดี้หน่อยสิ แล้วจะหายงอนทันทีเลยค่ะ 🎀", "โป้งแล้วนะ! ต้องเอาขนมมาแลกถึงจะยอมดีด้วย 😤"],
+      "บ้า": ["บ้าเพราะคุณนั่นแหละค่ะ ยัยคนน่ารัก 😤", "หืม พูดอะไรแปลกๆ เมโลดี้ไม่เข้าใจเลยค่ะ แฮะๆ 🌸"],
+      "bye": ["บ๊ายบายค่ะเพื่อนรัก แล้วแวะมาคุยกับเมโลดี้อีกบ่อยๆ นะคะ! 🌸", "ไว้เจอกันใหม่น้า เดินทางปลอดภัยและมีความสุขตลอดวันค่ะ 💕"]
+    },
+    defaultResponse: "เมโลดี้อยู่เคียงข้างคุณเสมอนะคะ! เล่าเรื่องราวของคุณให้เมโลดี้ฟังได้เลยค่ะ 🎀"
+  },
+  kuromi: {
+    name: "Kuromi 😈",
+    avatar: "https://www.sanrio.com/cdn/shop/files/198445178610_800x.png?v=1749746553",
+    styleClass: "kuromi-style",
+    welcome: "เฮ้ ยัยเด็กดื้อ! คุโรมิหัวหน้าแก๊งมาแล้ว! มีคำถามอะไรเด็ดๆ มาคุยกับฉันล่ะ? 😈",
+    responses: {
+      "hello": [
+        "ไง! ยินดีที่ได้คุยด้วย แต่อย่ามาแกล้งฉันล่ะ! 🖤",
+        "ว่าไง! มีเรื่องสนุกๆ อะไรมารายงานหัวหน้าแก๊งคุโรมิหรือเปล่า? 😏",
+        "โย่ว! ยินดีต้อนรับเข้าสู่แก๊งคุโรมิสุดเท่นะยัยเด็กดื้อ ✨"
+      ],
+      "สวัสดี": [
+        "ว่าไงยัยหนู! วันนี้ไปซนที่ไหนมาหรือเปล่าเนี่ย? หึหึ 😈",
+        "สวัสดี! มาทักทายหัวหน้าแก๊งแบบนี้ อยากเข้าแก๊งหรือไงฮะ? 🖤",
+        "ยินดีที่ได้เจอ! วันนี้เอาขนมหัวหอมใหญ่มาบรรณาการฉันรึยัง? 🧅"
+      ],
+      "น่ารัก": [
+        "รู้อยู่แล้วน่า! คุโรมิคนนี้ทั้งเท่ทั้งเฉียบที่สุดอยู่แล้วล่ะเซ่! 😈",
+        "หะ...ห๊า!? พูดเรื่องอะไรน่ะ! ฉันเท่ต่างหากล่ะยัยบ้า! เชอะ! 🖤",
+        "ชมแบบนี้ก็เขินแย่ดิ... แต่ก็ขอบใจนะ แฮะๆ 😳"
+      ],
+      "เหนื่อย": [
+        "เหรอ? ใครรังแกเธอบอกมาสิ! เดี๋ยวหัวหน้าแก๊งคุโรมิจะไปจัดการให้เอง! 🖤",
+        "ท้อแท้งั้นเหรอ? เอาพลังคุโรมิปราบปีศาจไปเลย! ฮึดสู้หน่อยยย! 😈",
+        "มาซบไหล่ฉันนี่มา... เดี๋ยวแบ่งปันขนมแสนอร่อยปลอบใจให้นิดนึงก็ได้น้า ✨"
+      ],
+      "รัก": [
+        "หือ?! พูดอะไรเขินๆ น่ะ... แต่อารมณ์ดีนะเนี่ยยอมให้รักก็ได้ เชอะ! 💕",
+        "ระ...รักเหมือนกันนั่นแหละ! แต่ฉันแกล้งบอกว่าเกลียดไปงั้นเอง แฮะๆ 😈",
+        "พูดอะไรเลี่ยนๆ น่า! แต่เอาเหอะ... ฉันยอมรับความรักของเธอไว้ก็ได้ 🖤"
+      ],
+      "เพลง": [
+        "จังหวะมันตื๊ดๆ โดนใจชะมัด! โยกหัวตามสไตล์คุโรมิกันหน่อยเซ่! 🎵",
+        "เพลงน่ารักเกินไปจนทำให้คุโรมิอารมณ์บูดชะมัด... แต่ก็เพราะดี แฮะ 🖤"
+      ],
+      "จีบ": ["คิดว่าจีบหัวหน้าแก๊งอย่างฉันติดง่ายๆ งั้นเรอะ 😏", "หึหึ ไปฝึกจีบสาวมาใหม่ร้อยปีน้าไอ้หนู! 😈"],
+      "เขิน": ["บ้าเอ๊ย อย่าพูดอะไรชวนขนลุกสิฟะ 🖤", "เขินงั้นเหรอ?! หน้าแดงเป็นสตรอว์เบอร์รี่แล้วนั่น 😈"],
+      "กอด": ["ก็...เห็นแก่ความพยายาม จะยอมให้กอดแป๊บนึงก็ได้นะ 😳", "เฮ้! อย่ามากอดกันดื้อๆ สิฟะ ปล่อยเลยยย 😤"],
+      "หวง": ["ใครอนุญาตให้เธอไปทำตัวน่ารักกับคนอื่นฮะ?! 😤", "หวงก็บอกมาตรงๆ อย่ามาอ้อมค้อม! 😈"],
+      "งอน": ["เชอะ! ง้อฉันด้วยนิยายโรแมนติกสักสามเล่มสิ แล้วจะยอมหายงอน 😤", "งอนแล้ว! ห้ามทักห้ามคุยจนกว่าฉันจะอารมณ์ดี 🖤"],
+      "bye": ["เฮ้ จะไปแล้วเหรอ? ห้ามไปนานนะ... เดี๋ยวคุโรมิเหงา แย่ชะมัด! 😈", "บ๊ายบาย! ไปผจญภัยแล้วอย่าลืมซื้อขนมกลับมาฝากด้วยล่ะ 🖤"]
+    },
+    defaultResponse: "เหรอๆ น่าสนใจดีนี่! แต่อย่าพยายามเปลี่ยนเรื่องสิ ฉันรอฟังอยู่นะ! 🖤"
+  }
+};
+
+function toggleChatPanel() {
+  const panel = document.getElementById('chatPanel');
+  if (panel) {
+    const isCurrentlyActive = panel.classList.contains('active');
+    panel.classList.toggle('active');
+    if (!isCurrentlyActive) { initChat(); }
+  }
+}
+
+function selectBot(bot) {
+  activeBot = bot;
+  document.querySelectorAll('.bot-selector-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.querySelector(`.bot-selector-btn.${bot}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  const toggleAvatar = document.getElementById('chatToggleAvatar');
+  if (toggleAvatar) toggleAvatar.src = botDetails[bot].avatar;
+
+  initChat();
+}
+
+function initChat() {
+  const chatBody = document.getElementById('chatBody');
+  if (chatBody) {
+    chatBody.innerHTML = '';
+    const bot = botDetails[activeBot];
+    
+    const msgEl = document.createElement('div');
+    msgEl.className = `chat-msg bot-msg ${bot.styleClass}`;
+    msgEl.innerText = bot.welcome;
+    chatBody.appendChild(msgEl);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+}
+
+function generateAIResponse(userText) {
+  const bot = botDetails[activeBot];
+  let replyText = bot.defaultResponse;
+  
+  // ตรวจสอบ Mention
+  const mentionMatch = userText.match(/@([a-zA-Z0-9\s]+)/);
+  if (mentionMatch) {
+    const mentionedName = mentionMatch[1].trim().toLowerCase();
+    const matchedMember = membersData.find(m => m.name.toLowerCase().includes(mentionedName));
+    if (matchedMember) {
+      if (activeBot === 'melody') {
+        replyText = `อ๋อ! พูดถึงคุณ ${matchedMember.name} หรอคะ? เขาเป็นคนน่ารักและคอยดูแลทุกคนอย่างดีเลยค่ะ แถมยังชอบ ${matchedMember.favChar} เหมือนเมโลดี้ด้วยนะคะ! 🌸`;
+      } else {
+        replyText = `เหอะ! ยัยเด็กดื้อพูดถึง @${matchedMember.name} งั้นเรอะ? เจ้าตัวแสบคนนั้นน่ะนะ... แต่ก็เท่ใช้ได้แหละมั้ง! 😈`;
+      }
+      return replyText;
+    }
+  }
+
+  // ตรวจสอบสติ๊กเกอร์
+  const stickerList = ['🎀','😈','🌸','🍮','🐸','🐱','🐶','🍎','🍒','🍓','🍭','🧁'];
+  if (stickerList.includes(userText.trim())) {
+    const randomSticker = stickerList[Math.floor(Math.random() * stickerList.length)];
+    if (activeBot === 'melody') {
+      replyText = `อุ๊ย สติ๊กเกอร์น่ารักจังเลยค่ะ! เมโลดี้ขอส่ง ${randomSticker} คืนให้คุณนะคะเพื่อนรัก! 🌸`;
+    } else {
+      replyText = `เชอะ! ส่งสติ๊กเกอร์มาท้าทายหัวหน้าแก๊งงั้นเรอะ เอาเจ้า ${randomSticker} นี่คืนไปเลย! 😈`;
+    }
+    return replyText;
+  }
+
+  // ประมวลผลข้อความค้นหาคีย์เวิร์ดแบบสุ่ม
+  const lowerText = userText.toLowerCase();
+  for (const key in bot.responses) {
+    if (lowerText.includes(key)) {
+      const responseOption = bot.responses[key];
+      if (Array.isArray(responseOption)) {
+        replyText = responseOption[Math.floor(Math.random() * responseOption.length)];
+      } else {
+        replyText = responseOption;
+      }
+      break;
+    }
+  }
+  return replyText;
+}
+
+function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const chatBody = document.getElementById('chatBody');
+  
+  if (input && input.value.trim() !== '' && chatBody) {
+    const userText = input.value.trim();
+    
+    const userMsgEl = document.createElement('div');
+    userMsgEl.className = 'chat-msg user-msg';
+    userMsgEl.innerText = userText;
+    chatBody.appendChild(userMsgEl);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    
+    input.value = '';
+    
+    document.getElementById('stickerPanel').style.display = 'none';
+    document.getElementById('mentionAutocomplete').style.display = 'none';
+
+    // แสดง AI Typing Indicator ดุ๊กดิ๊ก
+    const bot = botDetails[activeBot];
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = `chat-msg bot-msg typing-indicator-bubble ${bot.styleClass}`;
+    typingIndicator.innerHTML = `
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    `;
+    chatBody.appendChild(typingIndicator);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    setTimeout(() => {
+      typingIndicator.remove();
+      const replyText = generateAIResponse(userText);
+      
+      const botMsgEl = document.createElement('div');
+      botMsgEl.className = `chat-msg bot-msg ${bot.styleClass}`;
+      chatBody.appendChild(botMsgEl);
+      
+      // typing effect พิมพ์อักษรทีละตัวแบบเรียลไทม์
+      let index = 0;
+      function type() {
+        if (index < replyText.length) {
+          botMsgEl.innerText += replyText.charAt(index);
+          index++;
+          chatBody.scrollTop = chatBody.scrollHeight;
+          setTimeout(type, 25);
+        }
+      }
+      type();
+    }, 1200);
+  }
+}
+
+function sendSticker(sticker) {
+  const chatBody = document.getElementById('chatBody');
+  if (chatBody) {
+    const userMsgEl = document.createElement('div');
+    userMsgEl.className = 'chat-msg user-msg';
+    userMsgEl.innerText = sticker;
+    chatBody.appendChild(userMsgEl);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    
+    document.getElementById('stickerPanel').style.display = 'none';
+    
+    const bot = botDetails[activeBot];
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = `chat-msg bot-msg typing-indicator-bubble ${bot.styleClass}`;
+    typingIndicator.innerHTML = `
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    `;
+    chatBody.appendChild(typingIndicator);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    
+    setTimeout(() => {
+      typingIndicator.remove();
+      const replyText = generateAIResponse(sticker);
+      
+      const botMsgEl = document.createElement('div');
+      botMsgEl.className = `chat-msg bot-msg ${bot.styleClass}`;
+      chatBody.appendChild(botMsgEl);
+      
+      let index = 0;
+      function type() {
+        if (index < replyText.length) {
+          botMsgEl.innerText += replyText.charAt(index);
+          index++;
+          chatBody.scrollTop = chatBody.scrollHeight;
+          setTimeout(type, 25);
+        }
+      }
+      type();
+    }, 1000);
+  }
+}
+
+function toggleStickerPanel() {
+  const stickerPanel = document.getElementById('stickerPanel');
+  const mentionPanel = document.getElementById('mentionAutocomplete');
+  if (mentionPanel) mentionPanel.style.display = 'none';
+  if (stickerPanel) {
+    stickerPanel.style.display = (stickerPanel.style.display === 'block') ? 'none' : 'block';
+  }
+}
+
+// Auto-complete Mention ระบบแท็กรายชื่อ
+const chatInput = document.getElementById('chatInput');
+const mentionAutocomplete = document.getElementById('mentionAutocomplete');
+
+if (chatInput && mentionAutocomplete) {
+  chatInput.addEventListener('input', () => {
+    const val = chatInput.value;
+    const atIndex = val.lastIndexOf('@');
+    
+    if (atIndex !== -1 && atIndex === val.length - 1) {
+      showMentions("");
+    } else if (atIndex !== -1 && atIndex < val.length - 1) {
+      const query = val.substring(atIndex + 1);
+      if (query.includes(' ')) {
+        mentionAutocomplete.style.display = 'none';
+      } else {
+        showMentions(query);
+      }
+    } else {
+      mentionAutocomplete.style.display = 'none';
+    }
+  });
+}
+
+function showMentions(query) {
+  const mentionAutocomplete = document.getElementById('mentionAutocomplete');
+  if (!mentionAutocomplete) return;
+  
+  mentionAutocomplete.innerHTML = '';
+  const filtered = membersData.filter(m => m.name.toLowerCase().includes(query.toLowerCase()));
+  
+  if (filtered.length > 0) {
+    mentionAutocomplete.style.display = 'flex';
+    filtered.forEach(m => {
+      const item = document.createElement('div');
+      item.className = 'mention-item';
+      item.innerHTML = `
+        <img src="${m.img}" alt="${m.name}">
+        <span>${m.name}</span>
+      `;
+      item.addEventListener('click', () => {
+        const val = chatInput.value;
+        const atIndex = val.lastIndexOf('@');
+        chatInput.value = val.substring(0, atIndex) + `@${m.name} `;
+        mentionAutocomplete.style.display = 'none';
+        chatInput.focus();
+      });
+      mentionAutocomplete.appendChild(item);
+    });
+  } else {
+    mentionAutocomplete.style.display = 'none';
+  }
+}
+
+// ซ่อนเมนูอัตโนมัติเมื่อกดหน้าต่างคุยแชท
+const chatBody = document.getElementById('chatBody');
+if (chatBody) {
+  chatBody.addEventListener('click', () => {
+    const stickerPanel = document.getElementById('stickerPanel');
+    const mentionPanel = document.getElementById('mentionAutocomplete');
+    if (stickerPanel) stickerPanel.style.display = 'none';
+    if (mentionPanel) mentionPanel.style.display = 'none';
+  });
+}
+
+// ===================================================================================
+// INTERACTIVE MASCOT SCREEN PET ACTIONS (ระบบคำสั่งอนิเมชันสัตว์เลี้ยงดุ๊กดิ๊ก)
+// ===================================================================================
+let petActionInterval;
+let petAutoTimer;
+
+function changePetAction(action) {
+  const pet = document.getElementById('screen-pet');
+  const petImg = document.getElementById('pet-img');
+  const bubble = document.getElementById('pet-speech-bubble');
+  
+  // ล้างสถานะการขยับเดิม
+  clearInterval(petActionInterval);
+  pet.style.animation = '';
+  pet.style.transform = '';
+  petImg.style.transform = '';
+  
+  bubble.style.display = 'block';
+  
+  if (action === 'walk') {
+    bubble.innerText = "เดินเล่นแป๊บน้า! 🐾";
+    setTimeout(() => bubble.style.display = 'none', 2000);
+    
+    let direction = 1;
+    let offset = 0;
+    petActionInterval = setInterval(() => {
+      offset += direction * 1.5;
+      if (offset > 100 || offset < -10) {
+        direction *= -1;
+        petImg.style.transform = direction < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+      }
+      pet.style.transform = `translateX(${offset}px)`;
+    }, 50);
+    
+  } else if (action === 'sit') {
+    bubble.innerText = "ขอนั่งพักก่อนนะ... 🌸";
+    setTimeout(() => bubble.style.display = 'none', 2000);
+    pet.style.transform = 'translateY(8px) scaleY(0.9)';
+    
+  } else if (action === 'jump') {
+    bubble.innerText = "เย้ๆ ยิปปี้~ ✨";
+    setTimeout(() => bubble.style.display = 'none', 2000);
+    pet.style.animation = 'petJumpAnimation 0.5s infinite alternate ease-in-out';
+  }
+}
+
+// สุ่มท่าทางทุกๆ 10 วินาที
+function startAutoPetMascot() {
+  const actions = ['walk', 'sit', 'jump'];
+  
+  // ทำงานทันทีเมื่อเปิดหน้าเว็บ
+  const randomAction = actions[Math.floor(Math.random() * actions.length)];
+  changePetAction(randomAction);
+  
+  // ลูปสุ่มเปลี่ยนไปเรื่อยๆ
+  clearInterval(petAutoTimer);
+  petAutoTimer = setInterval(() => {
+    if (document.hidden) return; // หยุดถ้าระบบไม่อยู่ในหน้านั้น
+    const nextAction = actions[Math.floor(Math.random() * actions.length)];
+    changePetAction(nextAction);
+  }, 10000);
+}
+
+// DOMContentLoaded Initialization
+document.addEventListener('DOMContentLoaded', () => {
+  initFallingEffects();
+  initFloatingStickers();
+  showRandomWelcomeMessage();
+  initPlaylistDropup();
+  initHoloCardEffect();
+  updateDayNightMode();
+  
+  setInterval(updateDayNightMode, 60000); // อัปเดตโหมดตามเวลาจริงทุก 60 วินาที
+  setInterval(updateLiveClock, 1000);
+  updateLiveClock();
+  setInterval(updateOnlineCounter, 5000);
+  updateOnlineCounter();
+
+  selectBot('melody');
+});
+
+
+// SECURITY / NO DEVTOOLS
+try {
+  document.onkeydown=function(e){
+    if(e.keyCode==123){return false;}
+    if(e.ctrlKey && e.shiftKey && (e.keyCode=='I'.charCodeAt(0)||e.keyCode=='C'.charCodeAt(0)||e.keyCode=='J'.charCodeAt(0))){return false;}
+    if(e.ctrlKey && e.keyCode=='U'.charCodeAt(0)){return false;}
+  };
+  document.addEventListener('contextmenu',function(e){e.preventDefault();},false);
+} catch(err) {}
+
+
+
+</script>
+
+</body>
+</html>
