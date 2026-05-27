@@ -15,7 +15,25 @@
   <!-- ไอคอนแท็บเบราว์เซอร์สไตล์ Sanrio (Hello Kitty) -->
   <link rel="shortcut icon" href="https://www.sanrio.com/cdn/shop/files/198445178597_800x.png?v=1749746317" type="image/x-icon">
   
+  
   <style>
+
+    
+
+    /* ป้องกันการเลือกข้อความ/คลุมดำทั่วทั้งหน้าเว็บ */
+body {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE10+ */
+  user-select: none;         /* Standard */
+}
+
+/* ป้องกันการลากรูปภาพ */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none; /* ป้องกันการคลิกขวาเซฟรูปตรงๆ */
+}
     /* ==========================================================
    ระบบควบคุมการแสดงผลป๊อปอัปเมื่อเลื่อนเมาส์มาโดนการ์ด (Hover Popover System)
    ========================================================== */
@@ -3528,16 +3546,69 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// SECURITY / NO DEVTOOLS
+// SECURITY / NO DEVTOOLS (ฉบับเพิ่มระบบป้องกัน)
 try {
-  document.onkeydown=function(e){
-    if(e.keyCode==123){return false;}
-    if(e.ctrlKey && e.shiftKey && (e.keyCode=='I'.charCodeAt(0)||e.keyCode=='C'.charCodeAt(0)||e.keyCode=='J'.charCodeAt(0))){return false;}
-    if(e.ctrlKey && e.keyCode=='U'.charCodeAt(0)){return false;}
-  };
-  document.addEventListener('contextmenu',function(e){e.preventDefault();},false);
-} catch(err) {}
+  // 1. ป้องกันการคลิกขวา
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  }, false);
 
+  // 2. ป้องกันปุ่มคีย์บอร์ดลัดเพื่อเข้าถึงซอร์สโค้ด
+  document.addEventListener('keydown', function(e) {
+    // ป้องกัน F12
+    if (e.keyCode === 123) {
+      e.preventDefault();
+      return false;
+    }
+    // ป้องกัน Ctrl + Shift + I (Inspect), Ctrl + Shift + J (Console), Ctrl + Shift + C
+    if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+      e.preventDefault();
+      return false;
+    }
+    // ป้องกัน Ctrl + U (ดู Source Code)
+    if (e.ctrlKey && e.keyCode === 85) {
+      e.preventDefault();
+      return false;
+    }
+    // ป้องกัน Ctrl + S (เซฟหน้าเว็บ)
+    if (e.ctrlKey && e.keyCode === 83) {
+      e.preventDefault();
+      return false;
+    }
+    // ป้องกัน Ctrl + P (สั่งพิมพ์หน้าเว็บ)
+    if (e.ctrlKey && e.keyCode === 80) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // 3. ระบบดักตรวจการเปิด Inspect Element ผ่านการคำนวณความหน่วงของ Debugger
+  setInterval(function() {
+    const startTime = performance.now();
+    debugger; 
+    const endTime = performance.now();
+    if (endTime - startTime > 100) {
+      document.body.innerHTML = `
+        <div style="text-align:center; margin-top:100px; font-family:'Fredoka', sans-serif; color:#ff6b8b;">
+          <h2>กรุณาปิดหน้าต่าง Inspect Element เพื่อใช้งานต่อค่ะ ♡</h2>
+        </div>
+      `;
+    }
+  }, 1000);
+
+  // 4. การล็อกสิทธิ์การรันโค้ดเฉพาะโดเมนที่คุณใช้งาน (Domain Lock)
+  // ให้แก้ไขข้อความ 'yourdomain.com' เป็นชื่อโดเมนจริงของคุณเมื่ออัปโหลดขึ้นเซิร์ฟเวอร์
+  const allowedDomain = 'sanrio-coral.vercel.app'; 
+  if (window.location.hostname !== allowedDomain && 
+      window.location.hostname !== 'localhost' && 
+      window.location.hostname !== '127.0.0.1') {
+    document.body.innerHTML = `
+      <div style="text-align:center; margin-top:100px; font-family:'Fredoka', sans-serif; color:#ff6b8b;">
+        <h2>ขออภัย ไม่อนุญาตให้คัดลอกไฟล์ไปเปิดใช้งานบนโดเมนอื่นค่ะ ♡</h2>
+      </div>
+    `;
+  }
+} catch(err) {}
 
 
 </script>
